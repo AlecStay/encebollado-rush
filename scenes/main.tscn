@@ -1,0 +1,135 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://templates/player.tscn" id="2_player"]
+[ext_resource type="Texture2D" path="res://sprites/water_tile.svg" id="3_water"]
+[ext_resource type="Texture2D" path="res://sprites/sand_tile.svg" id="4_sand"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Water" type="TextureRect" parent="Background"]
+texture_repeat = 2
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 480.0
+offset_bottom = 270.0
+texture = ExtResource("3_water")
+stretch_mode = 1
+
+[node name="Sand" type="TextureRect" parent="Background"]
+texture_repeat = 2
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 480.0
+offset_bottom = 40.0
+texture = ExtResource("4_sand")
+stretch_mode = 1
+
+[node name="Spawnables" type="Node2D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(240, 200)
+
+[node name="Spawner" type="Node2D" parent="."]
+
+[node name="HazardTimer" type="Timer" parent="Spawner"]
+one_shot = true
+autostart = false
+
+[node name="BonusTimer" type="Timer" parent="Spawner"]
+one_shot = true
+autostart = false
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="HealthBar" type="ProgressBar" parent="HUD"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 172.0
+offset_bottom = 24.0
+min_value = 0.0
+max_value = 1.0
+value = 1.0
+
+[node name="LivesLabel" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 28.0
+offset_right = 172.0
+offset_bottom = 44.0
+text = "Vidas: 3"
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 44.0
+offset_right = 172.0
+offset_bottom = 60.0
+text = "Puntos: 0 / 100"
+
+[node name="StateLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 0.0
+offset_top = 90.0
+offset_right = 480.0
+offset_bottom = 130.0
+horizontal_alignment = 1
+text = ""
+
+[node name="RestartLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 0.0
+offset_top = 130.0
+offset_right = 480.0
+offset_bottom = 150.0
+horizontal_alignment = 1
+text = "Toca para reiniciar"
+
+[node name="PhotoPopup" type="Panel" parent="HUD"]
+visible = false
+offset_left = 120.0
+offset_top = 60.0
+offset_right = 360.0
+offset_bottom = 210.0
+
+[node name="PhotoRect" type="TextureRect" parent="HUD/PhotoPopup"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 232.0
+offset_bottom = 104.0
+stretch_mode = 5
+
+[node name="PhotoLabel" type="Label" parent="HUD/PhotoPopup"]
+offset_left = 8.0
+offset_top = 112.0
+offset_right = 232.0
+offset_bottom = 136.0
+horizontal_alignment = 1
+text = "Foto de Manta"
+
+[node name="HideTimer" type="Timer" parent="HUD/PhotoPopup"]
+one_shot = true
+autostart = false
+
+[node name="BtnReintentar" type="Button" parent="HUD"]
+visible = false
+offset_left = 116.0
+offset_top = 155.0
+offset_right = 236.0
+offset_bottom = 182.0
+text = "Reintentar"
+
+[node name="BtnMenuPrincipal" type="Button" parent="HUD"]
+visible = false
+offset_left = 244.0
+offset_top = 155.0
+offset_right = 364.0
+offset_bottom = 182.0
+text = "Menu Principal"
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="Audio"]
+
+[node name="SfxPlayer" type="AudioStreamPlayer" parent="Audio"]

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- base water -->
+  <rect x="0" y="0" width="32" height="32" fill="#1c70a8"/>
+  <!-- depth gradient bands -->
+  <rect x="0" y="0" width="32" height="11" fill="#1f7cb6"/>
+  <rect x="0" y="22" width="32" height="10" fill="#155f94"/>
+  <!-- wave streaks (top) -->
+  <rect x="2" y="4" width="8" height="1" fill="#3aa0d8" opacity="0.6"/>
+  <rect x="14" y="2" width="6" height="1" fill="#3aa0d8" opacity="0.6"/>
+  <rect x="22" y="6" width="6" height="1" fill="#3aa0d8" opacity="0.6"/>
+  <!-- wave streaks (mid) -->
+  <rect x="6" y="13" width="4" height="1" fill="#5ab8e8" opacity="0.5"/>
+  <rect x="18" y="15" width="8" height="1" fill="#5ab8e8" opacity="0.5"/>
+  <!-- wave streaks (bottom) -->
+  <rect x="0" y="24" width="6" height="1" fill="#3a90c4" opacity="0.5"/>
+  <rect x="10" y="27" width="10" height="1" fill="#3a90c4" opacity="0.5"/>
+  <rect x="24" y="29" width="6" height="1" fill="#3a90c4" opacity="0.5"/>
+  <!-- sparkle dots -->
+  <rect x="5" y="9" width="1" height="1" fill="#bfe8ff"/>
+  <rect x="20" y="11" width="1" height="1" fill="#bfe8ff"/>
+  <rect x="13" y="20" width="1" height="1" fill="#bfe8ff"/>
+  <rect x="27" y="19" width="1" height="1" fill="#bfe8ff"/>
+  <rect x="3" y="28" width="1" height="1" fill="#bfe8ff"/>
+</svg>

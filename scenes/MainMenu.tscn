@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://bxb1xt7iaoqjk"]
+
+[ext_resource type="Script" uid="uid://bvv7un5mdyws7" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_mainmenu"]
+[ext_resource type="Texture2D" uid="uid://saquq3n70amb" path="res://sprites/fish.svg" id="3_fish"]
+
+[node name="MainMenu" type="Control" unique_id=370869822]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="TextureRect" parent="." unique_id=683859311]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_mainmenu")
+expand_mode = 1
+
+[node name="MenuContainer" type="VBoxContainer" parent="." unique_id=674655478]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 91.0
+offset_right = 241.0
+offset_bottom = 254.0
+theme_override_constants/separation = 2
+
+[node name="BtnSinglePlayer" type="Button" parent="MenuContainer" unique_id=1670765898]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "UN SOLO JUGADOR"
+flat = true
+alignment = 0
+
+[node name="BtnMultiplayer" type="Button" parent="MenuContainer" unique_id=401438646]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "MULTIJUGADOR LOCAL"
+flat = true
+alignment = 0
+
+[node name="BtnShop" type="Button" parent="MenuContainer" unique_id=1013578564]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "TIENDA DE ITEMS"
+flat = true
+alignment = 0
+
+[node name="BtnSettings" type="Button" parent="MenuContainer" unique_id=904664463]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "CONFIGURACION"
+flat = true
+alignment = 0
+
+[node name="BtnAppearance" type="Button" parent="MenuContainer" unique_id=1883410305]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "APARIENCIA"
+flat = true
+alignment = 0
+
+[node name="CursorIcon" type="TextureRect" parent="." unique_id=926856821]
+visible = false
+layout_mode = 0
+offset_right = 14.0
+offset_bottom = 14.0
+texture = ExtResource("3_fish")
+stretch_mode = 5

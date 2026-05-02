@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" shape-rendering="crispEdges">
+  <!-- top-down fish, swimming downward -->
+  <!-- tail (top) -->
+  <polygon points="6,0 10,0 9,3 7,3" fill="#1a5a8a"/>
+  <!-- body -->
+  <ellipse cx="8" cy="7" rx="4" ry="4" fill="#2a85c8"/>
+  <!-- back stripe -->
+  <ellipse cx="8" cy="6" rx="3" ry="2.5" fill="#3aa0e0"/>
+  <!-- side fins -->
+  <polygon points="3,7 5,6 5,8" fill="#1a5a8a"/>
+  <polygon points="13,7 11,6 11,8" fill="#1a5a8a"/>
+  <!-- belly highlight near head -->
+  <rect x="6" y="9" width="4" height="2" fill="#9be0ff"/>
+  <!-- head/snout -->
+  <rect x="7" y="11" width="2" height="1" fill="#2a85c8"/>
+  <!-- eyes -->
+  <rect x="6" y="9" width="1" height="1" fill="#ffffff"/>
+  <rect x="9" y="9" width="1" height="1" fill="#ffffff"/>
+  <rect x="6" y="9" width="1" height="1" fill="#000000" opacity="0.5"/>
+  <!-- scale dots -->
+  <rect x="7" y="7" width="1" height="1" fill="#1a5a8a" opacity="0.5"/>
+  <rect x="9" y="7" width="1" height="1" fill="#1a5a8a" opacity="0.5"/>
+</svg>

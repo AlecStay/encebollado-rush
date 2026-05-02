@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="28" viewBox="0 0 18 28" shape-rendering="crispEdges">
+  <!-- top-down view: arms extended forward, fins kicking -->
+  <!-- swim fins (slight kick offset) -->
+  <rect x="2" y="21" width="4" height="6" fill="#1a4a6e"/>
+  <rect x="12" y="23" width="4" height="5" fill="#1a4a6e"/>
+  <!-- body / wetsuit torso -->
+  <rect x="5" y="9" width="8" height="14" fill="#1f6aa5"/>
+  <rect x="6" y="10" width="6" height="12" fill="#2a83c7"/>
+  <!-- arms extended forward (toward head/top) -->
+  <rect x="4" y="2" width="2" height="9" fill="#e8b27a"/>
+  <rect x="12" y="2" width="2" height="9" fill="#e8b27a"/>
+  <!-- hands -->
+  <rect x="3" y="1" width="3" height="2" fill="#f0c08a"/>
+  <rect x="12" y="1" width="3" height="2" fill="#f0c08a"/>
+  <!-- head -->
+  <rect x="6" y="3" width="6" height="7" fill="#f0c08a"/>
+  <rect x="6" y="3" width="6" height="2" fill="#3a2a1a"/>
+  <!-- mask/goggles -->
+  <rect x="6" y="5" width="6" height="2" fill="#0a0a14"/>
+  <rect x="7" y="6" width="2" height="1" fill="#7fdfff"/>
+  <rect x="10" y="6" width="2" height="1" fill="#7fdfff"/>
+  <!-- snorkel -->
+  <rect x="12" y="4" width="1" height="4" fill="#ffaa33"/>
+  <!-- bubbles trailing -->
+  <rect x="8" y="26" width="1" height="1" fill="#ffffff" opacity="0.7"/>
+  <rect x="10" y="27" width="1" height="1" fill="#ffffff" opacity="0.7"/>
+</svg>
