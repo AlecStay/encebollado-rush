@@ -1,21 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="18" height="28" viewBox="0 0 18 28" shape-rendering="crispEdges">
-  <!-- top-down view: head at top, fins at bottom -->
-  <!-- swim fins -->
-  <rect x="3" y="22" width="4" height="5" fill="#1a4a6e"/>
-  <rect x="11" y="22" width="4" height="5" fill="#1a4a6e"/>
-  <!-- body / wetsuit torso -->
-  <rect x="5" y="9" width="8" height="14" fill="#1f6aa5"/>
-  <rect x="6" y="10" width="6" height="12" fill="#2a83c7"/>
-  <!-- arms tucked along body -->
-  <rect x="3" y="11" width="2" height="8" fill="#e8b27a"/>
-  <rect x="13" y="11" width="2" height="8" fill="#e8b27a"/>
-  <!-- head -->
-  <rect x="6" y="2" width="6" height="7" fill="#f0c08a"/>
-  <rect x="6" y="2" width="6" height="2" fill="#3a2a1a"/>
-  <!-- mask/goggles -->
-  <rect x="6" y="4" width="6" height="2" fill="#0a0a14"/>
-  <rect x="7" y="5" width="2" height="1" fill="#7fdfff"/>
-  <rect x="10" y="5" width="2" height="1" fill="#7fdfff"/>
-  <!-- snorkel -->
-  <rect x="12" y="3" width="1" height="4" fill="#ffaa33"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="24" height="32">
+  <!-- Surfboard -->
+  <ellipse cx="12" cy="29.5" rx="10.5" ry="2.8" fill="#E65100" stroke="#3E2723" stroke-width="0.5"/>
+  <ellipse cx="12" cy="29" rx="7" ry="1.6" fill="#FF8F00" opacity="0.7"/>
+  <!-- Legs -->
+  <rect x="8.5" y="22" width="3" height="7" rx="1.5" fill="#0D47A1"/>
+  <rect x="12.5" y="22" width="3" height="7" rx="1.5" fill="#0D47A1"/>
+  <!-- Body wetsuit -->
+  <rect x="7" y="12.5" width="10" height="10.5" rx="2.5" fill="#1565C0"/>
+  <rect x="10.5" y="12.5" width="3" height="10.5" fill="#1976D2" opacity="0.5"/>
+  <!-- Arms idle -->
+  <rect x="1.5" y="14.5" width="6" height="2.2" rx="1.1" fill="#1565C0"/>
+  <rect x="16.5" y="14.5" width="6" height="2.2" rx="1.1" fill="#1565C0"/>
+  <!-- Neck -->
+  <rect x="10.5" y="10" width="3" height="3.5" fill="#D4A574"/>
+  <!-- Tuna head body -->
+  <ellipse cx="12" cy="6.5" rx="6.5" ry="5.5" fill="#546E7A"/>
+  <!-- Tail fin -->
+  <polygon points="18,4.5 23.5,1.5 23.5,6 21,5.5 21,7.5 23.5,7 23.5,11.5 18,8.5" fill="#455A64"/>
+  <!-- Dorsal fin -->
+  <polygon points="10.5,2 12,0 13.5,2 13,3.2 11,3.2" fill="#455A64"/>
+  <!-- Pectoral fin -->
+  <ellipse cx="9" cy="8.5" rx="3.5" ry="1.4" fill="#455A64" transform="rotate(-25 9 8.5)"/>
+  <!-- Belly -->
+  <ellipse cx="11" cy="8" rx="4.5" ry="3" fill="#B0BEC5" opacity="0.5"/>
+  <!-- Eye -->
+  <circle cx="8.5" cy="6" r="2" fill="white"/>
+  <circle cx="8.1" cy="6" r="1.1" fill="#1A237E"/>
+  <circle cx="7.7" cy="5.6" r="0.4" fill="white"/>
+  <!-- Mouth -->
+  <path d="M 5.2 9.5 Q 6.5 10.8 8 10.2" stroke="#263238" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+  <!-- Lateral line -->
+  <path d="M 8.5 7 Q 12 6.5 17.5 7" stroke="#607D8B" stroke-width="0.5" fill="none" opacity="0.7"/>
 </svg>

@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/decoration.gd" id="1_dec"]
+[ext_resource type="Texture2D" path="res://sprites/foam_new.png" id="2_tex"]
+
+[node name="DecorFoam" type="Node2D"]
+script = ExtResource("1_dec")
+modulate = Color(1, 1, 1, 0.55)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_tex")
+scale = Vector2(1.0, 1.0)

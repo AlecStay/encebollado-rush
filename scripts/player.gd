@@ -3,14 +3,27 @@ extends CharacterBody2D
 @export var move_speed := 220.0
 @export var bounds_margin := 20.0
 
+@export var tex_n:  Texture2D
+@export var tex_ne: Texture2D
+@export var tex_e:  Texture2D
+@export var tex_se: Texture2D
+@export var tex_s:  Texture2D
+@export var tex_sw: Texture2D
+@export var tex_w:  Texture2D
+@export var tex_nw: Texture2D
+
 var _target_position := Vector2.ZERO
 var _has_target := false
 var _input_enabled := true
 var _invulnerable_time := 0.0
 var _blink_time := 0.0
+var _last_facing := Vector2.DOWN
+
+@onready var _body: Sprite2D = $Body
 
 func _ready() -> void:
 	_target_position = global_position
+	_set_facing(Vector2.DOWN)
 
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
@@ -62,14 +75,17 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
+	var move_dir := Vector2.ZERO
 	var keyboard_dir := _get_keyboard_dir()
 	if keyboard_dir != Vector2.ZERO:
 		_has_target = false
+		move_dir = keyboard_dir
 		velocity = keyboard_dir * move_speed
 	elif _has_target:
 		var to_target := _target_position - global_position
 		if to_target.length() > 4.0:
-			velocity = to_target.normalized() * move_speed
+			move_dir = to_target.normalized()
+			velocity = move_dir * move_speed
 		else:
 			velocity = Vector2.ZERO
 	else:
@@ -78,17 +94,41 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_clamp_to_view()
 
+	if move_dir != Vector2.ZERO:
+		_set_facing(move_dir)
+
+func _set_facing(dir: Vector2) -> void:
+	if dir == _last_facing:
+		return
+	_last_facing = dir
+	if _body == null:
+		return
+	var angle := dir.angle()
+	# Bucket into 8 octants. angle: -PI..PI (E=0, S=PI/2, W=PI, N=-PI/2)
+	var octant := int(round(angle / (PI / 4.0))) % 8
+	if octant < 0:
+		octant += 8
+	# octant: 0=E, 1=SE, 2=S, 3=SW, 4=W, 5=NW(or -3), 6=N(or -2), 7=NE(or -1)
+	var tex: Texture2D = null
+	match octant:
+		0: tex = tex_e
+		1: tex = tex_se
+		2: tex = tex_s
+		3: tex = tex_sw
+		4: tex = tex_w
+		5: tex = tex_nw
+		6: tex = tex_n
+		7: tex = tex_ne
+	if tex:
+		_body.texture = tex
+
 func _get_keyboard_dir() -> Vector2:
 	var x := 0
-	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
-		x -= 1
-	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
-		x += 1
+	if Input.is_key_pressed(KEY_LEFT)  or Input.is_key_pressed(KEY_A): x -= 1
+	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D): x += 1
 	var y := 0
-	if Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W):
-		y -= 1
-	if Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S):
-		y += 1
+	if Input.is_key_pressed(KEY_UP)   or Input.is_key_pressed(KEY_W): y -= 1
+	if Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S): y += 1
 	var dir := Vector2(x, y)
 	if dir == Vector2.ZERO:
 		return Vector2.ZERO

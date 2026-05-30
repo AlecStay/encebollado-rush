@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/spawnable.gd" id="1_spawn"]
+[ext_resource type="Texture2D" path="res://sprites/golden.svg" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_golden"]
+size = Vector2(14, 14)
+
+[node name="Golden" type="Area2D" groups=["spawnable"]]
+script = ExtResource("1_spawn")
+kind = "golden"
+is_hazard = false
+points = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_golden")

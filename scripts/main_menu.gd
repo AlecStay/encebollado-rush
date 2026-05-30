@@ -67,16 +67,16 @@ func _on_btn_exit() -> void:
 	_cursor_icon.visible = false
 
 func _on_single_player_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/LevelSelect.tscn")
 
 func _on_multiplayer_pressed() -> void:
-	print("Navigating to Local Multiplayer")
+	get_tree().change_scene_to_file("res://scenes/HighScore.tscn")
 
 func _on_shop_pressed() -> void:
 	print("Navigating to Shop")
 
 func _on_settings_pressed() -> void:
-	print("Navigating to Settings")
+	get_tree().change_scene_to_file("res://scenes/Settings.tscn")
 
 func _on_appearance_pressed() -> void:
 	print("Navigating to Appearance")

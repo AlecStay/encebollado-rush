@@ -1,3 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Graphify files
+graphify-out/
+.vscode/graphify-out/
+graphify_chunk01.py

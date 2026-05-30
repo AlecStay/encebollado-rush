@@ -1,33 +1,32 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
-[ext_resource type="Texture2D" path="res://sprites/player_idle.svg" id="2_idle"]
-[ext_resource type="Texture2D" path="res://sprites/player_swim.svg" id="3_swim"]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_idle")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_swim")
-}],
-"loop": true,
-"name": &"swim",
-"speed": 4.0
-}]
+[ext_resource type="Texture2D" path="res://sprites/player_n.png"  id="2_n"]
+[ext_resource type="Texture2D" path="res://sprites/player_ne.png" id="3_ne"]
+[ext_resource type="Texture2D" path="res://sprites/player_e.png"  id="4_e"]
+[ext_resource type="Texture2D" path="res://sprites/player_se.png" id="5_se"]
+[ext_resource type="Texture2D" path="res://sprites/player_s.png"  id="6_s"]
+[ext_resource type="Texture2D" path="res://sprites/player_sw.png" id="7_sw"]
+[ext_resource type="Texture2D" path="res://sprites/player_w.png"  id="8_w"]
+[ext_resource type="Texture2D" path="res://sprites/player_nw.png" id="9_nw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(14, 22)
+size = Vector2(18, 22)
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_player")
+tex_n  = ExtResource("2_n")
+tex_ne = ExtResource("3_ne")
+tex_e  = ExtResource("4_e")
+tex_se = ExtResource("5_se")
+tex_s  = ExtResource("6_s")
+tex_sw = ExtResource("7_sw")
+tex_w  = ExtResource("8_w")
+tex_nw = ExtResource("9_nw")
 
-[node name="Body" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_player")
-animation = &"swim"
-autoplay = "swim"
+[node name="Body" type="Sprite2D" parent="."]
+texture = ExtResource("6_s")
+scale = Vector2(0.45, 0.45)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_player")

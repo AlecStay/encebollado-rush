@@ -1,19 +1,20 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/spawnable.gd" id="1_spawn"]
-[ext_resource type="Texture2D" path="res://sprites/shark.svg" id="2_tex"]
+[ext_resource type="Texture2D" path="res://sprites/shark_new.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shark"]
-size = Vector2(20, 12)
+size = Vector2(22, 18)
 
 [node name="Shark" type="Area2D"]
 script = ExtResource("1_spawn")
 kind = "shark"
 is_hazard = true
-points = 0
+points = 50
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_tex")
+scale = Vector2(0.5, 0.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_shark")
