@@ -38,50 +38,40 @@ func _apply_theme() -> void:
 	_title.theme = lbl_theme
 
 func _populate_scores() -> void:
-	var scores := HighScoreManager.get_scores()
+	var scores := HighScoreManager.get_all_scores()
 
 	var row_theme := Theme.new()
 	row_theme.set_color("font_color", "Label", _COLOR_NORMAL)
 	row_theme.set_constant("outline_size", "Label", 2)
 	row_theme.set_color("font_outline_color", "Label", _COLOR_SHADOW)
-	row_theme.set_font_size("font_size", "Label", 11)
+	row_theme.set_font_size("font_size", "Label", 12)
 
-	if scores.is_empty():
-		var lbl := Label.new()
-		lbl.text = "No hay puntajes aún. ¡Juega una partida!"
-		lbl.theme = row_theme
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_score_list.add_child(lbl)
-		return
-
-	for i: int in range(scores.size()):
-		var entry: Dictionary = scores[i]
+	for i in range(GameState.LEVELS.size()):
+		var lvl_name: String = GameState.LEVELS[i].name
+		var data: Dictionary = scores.get(str(i), {"score": 0, "spondylus": 0})
+		
 		var row := HBoxContainer.new()
 		row.theme = row_theme
-		row.add_theme_constant_override("separation", 8)
+		row.add_theme_constant_override("separation", 10)
 
-		var rank := Label.new()
-		rank.text = "#%d" % (i + 1)
-		rank.custom_minimum_size = Vector2(28, 0)
+		var name_lbl := Label.new()
+		name_lbl.text = lvl_name
+		name_lbl.custom_minimum_size = Vector2(160, 0)
+		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 		var score_lbl := Label.new()
-		score_lbl.text = "%d pts" % int(entry.get("score", 0))
+		score_lbl.text = "%d pts" % int(data.get("score", 0))
 		score_lbl.custom_minimum_size = Vector2(60, 0)
 		score_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		score_lbl.add_theme_color_override("font_color", _COLOR_HOVER)
 
-		var date_lbl := Label.new()
-		date_lbl.text = entry.get("date", "")
-		date_lbl.custom_minimum_size = Vector2(90, 0)
-		date_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		date_lbl.modulate.a = 0.7
+		var sp_lbl := Label.new()
+		sp_lbl.text = "%d Spondy" % int(data.get("spondylus", 0))
+		sp_lbl.custom_minimum_size = Vector2(80, 0)
+		sp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		sp_lbl.add_theme_color_override("font_color", _COLOR_ACCENT)
 
-		var status_lbl := Label.new()
-		var won: bool = entry.get("won", false)
-		status_lbl.text = "GANÓ" if won else "PERDIÓ"
-		status_lbl.modulate = _COLOR_HOVER if won else _COLOR_ACCENT
-
-		row.add_child(rank)
+		row.add_child(name_lbl)
 		row.add_child(score_lbl)
-		row.add_child(date_lbl)
-		row.add_child(status_lbl)
+		row.add_child(sp_lbl)
 		_score_list.add_child(row)

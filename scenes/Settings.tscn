@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dsettings001"]
 
-[ext_resource type="Script" path="res://scripts/settings.gd" id="1_set"]
+[ext_resource type="Script" uid="uid://ct6qiuswabnop" path="res://scripts/settings.gd" id="1_set"]
 [ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://sprites/char_menu.png" id="3_player"]
+[ext_resource type="Texture2D" uid="uid://duiv4l4lfljiv" path="res://sprites/char_menu.png" id="3_player"]
 
-[node name="Settings" type="Control"]
+[node name="Settings" type="Control" unique_id=748830963]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_set")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=834037040]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,134 +23,86 @@ grow_vertical = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 
-[node name="Title" type="Label" parent="."]
+[node name="Title" type="Label" parent="." unique_id=1280056926]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 6.0
-offset_right = 300.0
-offset_bottom = 24.0
+offset_left = 33.0
+offset_top = 18.0
+offset_right = 293.0
+offset_bottom = 41.0
 text = "CONFIGURACIÓN"
 
-[node name="SettingsBox" type="VBoxContainer" parent="."]
+[node name="SettingsBox" type="VBoxContainer" parent="." unique_id=456057794]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 28.0
-offset_right = 295.0
-offset_bottom = 248.0
+offset_left = 33.0
+offset_top = 39.0
+offset_right = 288.0
+offset_bottom = 259.0
 theme_override_constants/separation = 5
 
-[node name="AudioLabel" type="Label" parent="SettingsBox"]
+[node name="AudioLabel" type="Label" parent="SettingsBox" unique_id=1930769101]
 layout_mode = 2
 text = "— AUDIO"
 
-[node name="MusicRow" type="HBoxContainer" parent="SettingsBox"]
+[node name="MusicRow" type="HBoxContainer" parent="SettingsBox" unique_id=451893396]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="MusicLabel" type="Label" parent="SettingsBox/MusicRow"]
-layout_mode = 2
+[node name="MusicLabel" type="Label" parent="SettingsBox/MusicRow" unique_id=1229901638]
 custom_minimum_size = Vector2(60, 0)
-size_flags_vertical = 4
+layout_mode = 2
 text = "Música"
 
-[node name="MusicSlider" type="HSlider" parent="SettingsBox/MusicRow"]
-layout_mode = 2
+[node name="MusicSlider" type="HSlider" parent="SettingsBox/MusicRow" unique_id=1711736442]
 custom_minimum_size = Vector2(130, 14)
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 0.8
 
-[node name="MusicPct" type="Label" parent="SettingsBox/MusicRow"]
-layout_mode = 2
+[node name="MusicPct" type="Label" parent="SettingsBox/MusicRow" unique_id=1625852082]
 custom_minimum_size = Vector2(32, 0)
-size_flags_vertical = 4
+layout_mode = 2
 text = "80%"
 
-[node name="SfxRow" type="HBoxContainer" parent="SettingsBox"]
+[node name="SfxRow" type="HBoxContainer" parent="SettingsBox" unique_id=1989993305]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SfxLabel" type="Label" parent="SettingsBox/SfxRow"]
-layout_mode = 2
+[node name="SfxLabel" type="Label" parent="SettingsBox/SfxRow" unique_id=1435141496]
 custom_minimum_size = Vector2(60, 0)
-size_flags_vertical = 4
+layout_mode = 2
 text = "Efectos"
 
-[node name="SfxSlider" type="HSlider" parent="SettingsBox/SfxRow"]
-layout_mode = 2
+[node name="SfxSlider" type="HSlider" parent="SettingsBox/SfxRow" unique_id=736536216]
 custom_minimum_size = Vector2(130, 14)
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="SfxPct" type="Label" parent="SettingsBox/SfxRow"]
-layout_mode = 2
+[node name="SfxPct" type="Label" parent="SettingsBox/SfxRow" unique_id=1898456247]
 custom_minimum_size = Vector2(32, 0)
-size_flags_vertical = 4
+layout_mode = 2
 text = "100%"
 
-[node name="DisplayLabel" type="Label" parent="SettingsBox"]
-layout_mode = 2
-text = "— PANTALLA"
 
-[node name="FullscreenRow" type="HBoxContainer" parent="SettingsBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="FsLabel" type="Label" parent="SettingsBox/FullscreenRow"]
-layout_mode = 2
-custom_minimum_size = Vector2(140, 0)
-size_flags_vertical = 4
-text = "Pantalla Completa"
 
-[node name="FsCheck" type="CheckButton" parent="SettingsBox/FullscreenRow"]
-layout_mode = 2
-size_flags_vertical = 4
-button_pressed = false
-text = ""
 
-[node name="DiffLabel" type="Label" parent="SettingsBox"]
-layout_mode = 2
-text = "— DIFICULTAD"
-
-[node name="DiffRow" type="HBoxContainer" parent="SettingsBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="BtnFacil" type="Button" parent="SettingsBox/DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "FÁCIL"
-
-[node name="BtnNormal" type="Button" parent="SettingsBox/DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "NORMAL"
-
-[node name="BtnDificil" type="Button" parent="SettingsBox/DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "DIFÍCIL"
-
-[node name="BtnVolver" type="Button" parent="."]
+[node name="BtnVolver" type="Button" parent="." unique_id=298161841]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 252.0
-offset_right = 200.0
-offset_bottom = 267.0
+offset_left = -6.0
+offset_top = 189.0
+offset_right = 154.0
+offset_bottom = 220.0
 text = "← VOLVER"
 flat = true
 
-[node name="PlayerDisplay" type="TextureRect" parent="."]
+[node name="PlayerDisplay" type="TextureRect" parent="." unique_id=1665501814]
 layout_mode = 0
 offset_left = 308.0
 offset_top = 35.0

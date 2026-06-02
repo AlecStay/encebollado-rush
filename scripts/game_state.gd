@@ -4,7 +4,7 @@ var current_level := 0
 
 const LEVELS: Array = [
 	{
-		"name":           "Amanecer",
+		"name":           "Las Costas de Jocay",
 		"water_modulate": Color(0.78, 0.88, 1.00),
 		"sand_modulate":  Color(1.00, 0.80, 0.58),
 		"ambient":        Color(1.00, 0.85, 0.70),
@@ -13,7 +13,7 @@ const LEVELS: Array = [
 		"is_night":       false,
 	},
 	{
-		"name":           "Tarde",
+		"name":           "El Arrecife Spondylus",
 		"water_modulate": Color(1.00, 1.00, 1.00),
 		"sand_modulate":  Color(1.00, 0.96, 0.80),
 		"ambient":        Color(1.00, 1.00, 0.97),
@@ -22,7 +22,7 @@ const LEVELS: Array = [
 		"is_night":       false,
 	},
 	{
-		"name":           "Atardecer",
+		"name":           "La Ruta de los Navegantes",
 		"water_modulate": Color(1.00, 0.68, 0.44),
 		"sand_modulate":  Color(1.00, 0.58, 0.35),
 		"ambient":        Color(1.00, 0.72, 0.50),
@@ -31,7 +31,7 @@ const LEVELS: Array = [
 		"is_night":       false,
 	},
 	{
-		"name":           "Anochecer",
+		"name":           "El Santuario de Umiña",
 		"water_modulate": Color(0.18, 0.24, 0.55),
 		"sand_modulate":  Color(0.32, 0.35, 0.50),
 		"ambient":        Color(0.45, 0.50, 0.75),

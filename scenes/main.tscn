@@ -75,6 +75,7 @@ offset_right = 172.0
 offset_bottom = 24.0
 min_value = 0.0
 max_value = 1.0
+step = 0.01
 value = 1.0
 
 [node name="LivesLabel" type="Label" parent="HUD"]
@@ -90,6 +91,113 @@ offset_top = 44.0
 offset_right = 172.0
 offset_bottom = 60.0
 text = "Puntos: 0"
+
+[node name="CoinsLabel" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 60.0
+offset_right = 172.0
+offset_bottom = 76.0
+text = "Spondylus: 0 / 20"
+
+[node name="ComboLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 12.0
+offset_top = 210.0
+offset_right = 212.0
+offset_bottom = 260.0
+theme_override_colors/font_color = Color(1, 0.85, 0, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.18, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Esquive Perfecto!!
+Combo x0.1"
+
+[node name="BtnPausa" type="Button" parent="HUD"]
+offset_left = 420.0
+offset_top = 10.0
+offset_right = 470.0
+offset_bottom = 35.0
+text = "II"
+
+[node name="BtnDodge" type="Button" parent="HUD"]
+offset_left = 380.0
+offset_top = 190.0
+offset_right = 460.0
+offset_bottom = 250.0
+text = "Salto"
+
+[node name="DodgeBar" type="ProgressBar" parent="HUD"]
+offset_left = 380.0
+offset_top = 175.0
+offset_right = 460.0
+offset_bottom = 185.0
+mouse_filter = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+show_percentage = false
+
+[node name="PauseMenu" type="Panel" parent="HUD"]
+process_mode = 2
+visible = false
+offset_right = 480.0
+offset_bottom = 270.0
+z_index = 100
+
+[node name="ColorRect" type="ColorRect" parent="HUD/PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="BtnReanudar" type="Button" parent="HUD/PauseMenu"]
+offset_left = 180.0
+offset_top = 80.0
+offset_right = 300.0
+offset_bottom = 110.0
+text = "Reanudar"
+
+[node name="LabelMusic" type="Label" parent="HUD/PauseMenu"]
+offset_left = 150.0
+offset_top = 120.0
+offset_right = 210.0
+offset_bottom = 140.0
+text = "Música"
+
+[node name="MusicSlider" type="HSlider" parent="HUD/PauseMenu"]
+offset_left = 220.0
+offset_top = 120.0
+offset_right = 330.0
+offset_bottom = 140.0
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="LabelSfx" type="Label" parent="HUD/PauseMenu"]
+offset_left = 150.0
+offset_top = 150.0
+offset_right = 210.0
+offset_bottom = 170.0
+text = "Efectos"
+
+[node name="SfxSlider" type="HSlider" parent="HUD/PauseMenu"]
+offset_left = 220.0
+offset_top = 150.0
+offset_right = 330.0
+offset_bottom = 170.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="BtnMenuPrincipalPausa" type="Button" parent="HUD/PauseMenu"]
+offset_left = 180.0
+offset_top = 190.0
+offset_right = 300.0
+offset_bottom = 220.0
+text = "Volver al Inicio"
 
 [node name="StateLabel" type="Label" parent="HUD"]
 visible = false

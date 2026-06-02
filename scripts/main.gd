@@ -1,10 +1,10 @@
 extends Node2D
 
-@export var scroll_speed := 120.0
-@export var hazard_spawn_min := 0.7
-@export var hazard_spawn_max := 1.3
+@export var scroll_speed := 180.0
+@export var hazard_spawn_min := 0.3
+@export var hazard_spawn_max := 0.6
 @export var bonus_spawn_min := 0.8
-@export var bonus_spawn_max := 1.6
+@export var bonus_spawn_max := 1.5
 @export var photo_texture: Texture2D
 @export var music_stream: AudioStream
 @export var hit_sfx: AudioStream
@@ -13,7 +13,7 @@ extends Node2D
 const DAMAGE_FRACTION   := 0.25
 const INVULNERABLE_TIME := 1.0
 const SPAWN_MARGIN      := 16.0
-const GOLDEN_CHANCE     := 0.08
+const GOLDEN_CHANCE     := 0.20
 const BONUS_DURATION    := 15.0
 const FRENETIC_MIN      := 0.12
 const FRENETIC_MAX      := 0.28
@@ -26,10 +26,25 @@ const MAP_FADE_TIME     := 1.0
 var _lives        := 3
 var _health       := 1.0
 var _score        := 0
+var _coins        := 0
+var _score_multiplier := 1
+var _ceviche_timer := 0.0
+var _cola_timer    := 0.0
 var _state        := "playing"
+var _level_passed := false
 var _bonus_active := false
 var _current_map  := 0
+var _spondylus_to_spawn := 0
 var _rng          := RandomNumberGenerator.new()
+
+var _damage_fraction := DAMAGE_FRACTION
+var _score_mult_base := 1.0
+var _bonus_duration_mult := 1.0
+
+var _combo_mult := 0.0
+var _combo_timer := 0.0
+var _combo_max_time := 0.0
+var _combo_base_pos := Vector2(12.0, 210.0)
 
 var _hazard_scenes: Array[PackedScene] = [
 	preload("res://templates/boat.tscn"),
@@ -46,6 +61,8 @@ var _bonus_scenes: Array[PackedScene] = [
 ]
 
 var _golden_scene: PackedScene = preload("res://templates/golden.tscn")
+var _emerald_scene: PackedScene = preload("res://templates/emerald.tscn")
+var _spondylus_scene: PackedScene = preload("res://templates/spondylus.tscn")
 
 var _decor_scenes: Array[PackedScene] = [
 	preload("res://templates/decor_bubbles.tscn"),
@@ -69,8 +86,12 @@ const DECOR_SCROLL_FACTOR := 0.6
 @onready var _health_bar: ProgressBar = $HUD/HealthBar
 @onready var _lives_label: Label      = $HUD/LivesLabel
 @onready var _score_label: Label      = $HUD/ScoreLabel
+@onready var _coins_label: Label      = $HUD/CoinsLabel
 @onready var _state_label: Label      = $HUD/StateLabel
 @onready var _bonus_label: Label      = $HUD/BonusLabel
+@onready var _combo_label: Label      = $HUD/ComboLabel
+@onready var _btn_dodge: Button       = $HUD/BtnDodge
+@onready var _dodge_bar: ProgressBar  = $HUD/DodgeBar
 @onready var _bonus_countdown: Timer  = $HUD/BonusCountdown
 @onready var _photo_popup: Panel      = $HUD/PhotoPopup
 @onready var _photo_rect: TextureRect = $HUD/PhotoPopup/PhotoRect
@@ -87,8 +108,18 @@ const DECOR_SCROLL_FACTOR := 0.6
 func _ready() -> void:
 	_rng.randomize()
 	_current_map = GameState.current_level
+	
+	var board = SettingsManager.equipped_board
+	if board == "caparazon_spondylus": _damage_fraction = DAMAGE_FRACTION * 0.5
+	if board == "rugido_jaguar": _score_mult_base = 1.5
+	if board == "mistica_umina": _bonus_duration_mult = 1.5
+	
+	for i in range(_current_map):
+		scroll_speed *= 1.25
+		hazard_spawn_min *= 0.8
+		hazard_spawn_max *= 0.8
+		
 	_apply_level_theme(_current_map, true)
-	_apply_difficulty()
 	_update_ui()
 	_setup_photo_popup()
 	_start_music()
@@ -110,21 +141,30 @@ func _ready() -> void:
 	_schedule_decor()
 	_btn_reintentar.pressed.connect(_on_reintentar_pressed)
 	_btn_menu_principal.pressed.connect(_on_menu_principal_pressed)
+	if _btn_dodge: _btn_dodge.pressed.connect(_on_btn_dodge_pressed)
 
-func _apply_difficulty() -> void:
-	match SettingsManager.difficulty:
-		0:
-			hazard_spawn_min *= 1.5
-			hazard_spawn_max *= 1.7
-			bonus_spawn_min  *= 0.65
-			bonus_spawn_max  *= 0.75
-			scroll_speed     *= 0.80
-		2:
-			hazard_spawn_min *= 0.60
-			hazard_spawn_max *= 0.70
-			bonus_spawn_min  *= 1.25
-			bonus_spawn_max  *= 1.35
-			scroll_speed     *= 1.30
+	var btn_pausa = get_node_or_null("HUD/BtnPausa")
+	if btn_pausa: btn_pausa.pressed.connect(_on_btn_pausa_pressed)
+	var btn_reanudar = get_node_or_null("HUD/PauseMenu/BtnReanudar")
+	if btn_reanudar: btn_reanudar.pressed.connect(_on_btn_reanudar_pressed)
+	var btn_config = get_node_or_null("HUD/PauseMenu/BtnMenuPrincipalPausa")
+	if btn_config: btn_config.pressed.connect(_on_menu_principal_pressed)
+
+	var m_slider = get_node_or_null("HUD/PauseMenu/MusicSlider")
+	if m_slider:
+		m_slider.value = SettingsManager.music_volume
+		m_slider.value_changed.connect(func(v):
+			SettingsManager.music_volume = v
+			_music_player.volume_db = SettingsManager.get_music_db()
+		)
+	var s_slider = get_node_or_null("HUD/PauseMenu/SfxSlider")
+	if s_slider:
+		s_slider.value = SettingsManager.sfx_volume
+		s_slider.value_changed.connect(func(v):
+			SettingsManager.sfx_volume = v
+			_sfx_player.volume_db = SettingsManager.get_sfx_db()
+		)
+
 
 func _apply_level_theme(idx: int, instant: bool) -> void:
 	var lvl: Dictionary = GameState.LEVELS[idx]
@@ -145,9 +185,37 @@ func _apply_level_theme(idx: int, instant: bool) -> void:
 	tween.tween_property(_canvas_modulate, "color", lvl.ambient, MAP_FADE_TIME)
 	tween.tween_property(_sun,   "position", Vector2(lvl.sun_x, lvl.sun_y), MAP_FADE_TIME)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _bonus_active and not _bonus_countdown.is_stopped():
 		_bonus_label.text = "¡NIVEL BONUS!  %ds" % int(ceil(_bonus_countdown.time_left))
+
+	if _ceviche_timer > 0.0:
+		_ceviche_timer -= delta
+		if _ceviche_timer <= 0.0:
+			_score_multiplier = 1
+
+	if _cola_timer > 0.0:
+		_cola_timer -= delta
+		if _cola_timer <= 0.0:
+			for node in get_tree().get_nodes_in_group("spawnable"):
+				if node.has_method("get_node"): # safe check
+					node.scroll_speed = scroll_speed
+
+	if _player and _btn_dodge and _dodge_bar:
+		_btn_dodge.text = "Salto\n%d/%d" % [_player.dodges_left, _player.MAX_DODGES]
+		if _player.dodges_left < _player.MAX_DODGES:
+			_dodge_bar.value = 1.0 - (_player.dodge_timer / _player.DODGE_COOLDOWN)
+		else:
+			_dodge_bar.value = 1.0
+
+	if _combo_timer > 0.0:
+		_combo_timer -= delta
+		var intensity = _combo_mult * 5.0 + 2.0
+		_combo_label.position = _combo_base_pos + Vector2(_rng.randf_range(-intensity, intensity), _rng.randf_range(-intensity, intensity))
+		_combo_label.modulate.a = _combo_timer / _combo_max_time
+		if _combo_timer <= 0.0:
+			_combo_label.position = _combo_base_pos
+			_reset_combo()
 
 # ── Spawning ─────────────────────────────────────────────────────────────────
 
@@ -160,8 +228,13 @@ func _on_hazard_timer_timeout() -> void:
 func _on_bonus_timer_timeout() -> void:
 	if _state != "playing" or _bonus_active:
 		return
-	if _rng.randf() < GOLDEN_CHANCE:
+	var r := _rng.randf()
+	if r < GOLDEN_CHANCE:
 		_spawn_scene(_golden_scene)
+	elif r < GOLDEN_CHANCE + 0.05:
+		_spawn_scene(_emerald_scene)
+	elif r < GOLDEN_CHANCE + 0.05 + 0.35:
+		_spawn_scene(_spondylus_scene)
 	else:
 		_spawn_from(_bonus_scenes)
 	_schedule_bonus()
@@ -205,7 +278,9 @@ func _spawn_from(scenes: Array[PackedScene]) -> void:
 
 func _spawn_scene(scene: PackedScene) -> void:
 	var spawnable := scene.instantiate() as Area2D
-	spawnable.scroll_speed = scroll_speed
+	var b_mult := 1.5 if _bonus_active else 1.0
+	var c_mult := 0.5 if _cola_timer > 0.0 else 1.0
+	spawnable.scroll_speed = scroll_speed * b_mult * c_mult
 	var sprite := spawnable.get_node("Sprite2D") as Sprite2D
 	var w := 24.0
 	var h := 24.0
@@ -232,31 +307,95 @@ func _on_spawnable_touched(spawnable: Area2D) -> void:
 		_enter_bonus_level()
 		return
 
+	if spawnable.kind == "emerald":
+		_play_sfx(bonus_sfx)
+		_player.start_emerald_buff(15.0 * _bonus_duration_mult)
+		return
+
+	if spawnable.kind == "spondylus":
+		_play_sfx(bonus_sfx)
+		var extra = 0
+		if _combo_mult > 0.0 and _rng.randf() < _combo_mult:
+			extra = 1
+		_coins += 1 + extra
+		_score += spawnable.points * _score_mult_base
+		_check_level_passed()
+		_update_ui()
+		return
+
 	if spawnable.is_hazard:
+		if _player.is_dodging:
+			_player.refund_dodge()
+			_increment_combo()
+			return
 		if _player.is_invulnerable():
 			return
+		_reset_combo()
 		_apply_damage()
-		_score = max(0, _score - spawnable.points)
 		_play_sfx(hit_sfx)
 	else:
 		var prev_score := _score
-		_score += spawnable.points
+		_score += spawnable.points * _score_multiplier * _score_mult_base
 		_play_sfx(bonus_sfx)
+
+		if not _bonus_active:
+			match spawnable.kind:
+				"encebollado":
+					_health = min(1.0, _health + 0.25)
+				"ceviche":
+					_score_multiplier = 2
+					_ceviche_timer = 10.0 * _bonus_duration_mult
+				"cola":
+					_cola_timer = 1.0 * _bonus_duration_mult
+					for node in get_tree().get_nodes_in_group("spawnable"):
+						if node.has_method("get_node"):
+							node.scroll_speed = scroll_speed * 0.5
+				"corviche":
+					for node in get_tree().get_nodes_in_group("spawnable"):
+						if node.get("is_hazard"): node.queue_free()
+
 		if spawnable.kind == "photo":
 			_show_photo_popup()
-		_check_map_transition(prev_score, _score)
 	_update_ui()
 
-func _check_map_transition(prev: int, curr: int) -> void:
-	var prev_step := prev / MAP_SCORE_STEP
-	var curr_step := curr / MAP_SCORE_STEP
-	if curr_step <= prev_step:
-		return
-	_current_map = (GameState.current_level + curr_step) % GameState.LEVELS.size()
-	_apply_level_theme(_current_map, false)
+func _increment_combo() -> void:
+	_combo_mult = min(1.0, _combo_mult + 0.1)
+	_combo_label.text = "¡Esquive Perfecto!\nCombo x%.1f" % _combo_mult
+	_combo_label.visible = true
+	_combo_label.modulate.a = 1.0
+	
+	_combo_max_time = max(1.0, 4.5 - (_combo_mult * 3.5))
+	_combo_timer = _combo_max_time
+
+func _reset_combo() -> void:
+	_combo_mult = 0.0
+	_combo_timer = 0.0
+	_combo_label.visible = false
+
+func _get_coins_to_pass() -> int:
+	if _current_map == 0: return 10
+	elif _current_map == 1: return 20
+	elif _current_map == 2: return 30
+	else: return 40
+
+func _check_level_passed() -> void:
+	if _coins >= _get_coins_to_pass():
+		HighScoreManager.save_score(_current_map, _score, _coins)
+		_coins = 0
+		_level_passed = true
+		_state_label.text = "¡NIVEL COMPLETADO!\nYa puedes volver al inicio"
+		_state_label.visible = true
+		get_tree().create_timer(4.0).timeout.connect(func(): if _state != "lose": _state_label.visible = false)
+		_current_map = (_current_map + 1) % GameState.LEVELS.size()
+		SettingsManager.unlock_level(_current_map)
+		_apply_level_theme(_current_map, false)
+		scroll_speed *= 1.25
+		hazard_spawn_min *= 0.8
+		hazard_spawn_max *= 0.8
+
 
 func _apply_damage() -> void:
-	_health = max(0.0, _health - DAMAGE_FRACTION)
+	_health = max(0.0, _health - _damage_fraction)
 	_player.start_invulnerable(INVULNERABLE_TIME)
 	if _health > 0.0:
 		return
@@ -274,18 +413,28 @@ func _enter_bonus_level() -> void:
 	_bonus_timer.stop()
 	for node in get_tree().get_nodes_in_group("spawnable"):
 		node.queue_free()
-	_bonus_label.text = "¡NIVEL BONUS!  %ds" % int(BONUS_DURATION)
+	if _current_map == 0: _spondylus_to_spawn = _rng.randi_range(1, 3)
+	elif _current_map == 1: _spondylus_to_spawn = _rng.randi_range(3, 6)
+	elif _current_map == 2: _spondylus_to_spawn = _rng.randi_range(10, 15)
+	else: _spondylus_to_spawn = _rng.randi_range(20, 25)
+	
+	_bonus_label.text = "¡NIVEL BONUS!  %ds" % int(BONUS_DURATION * _bonus_duration_mult)
 	_bonus_label.visible = true
-	_bonus_countdown.start(BONUS_DURATION)
-	_frenetic_timer.wait_time = FRENETIC_MIN
+	_bonus_countdown.start(BONUS_DURATION * _bonus_duration_mult)
+	_player.start_bonus_blink(true)
+	_frenetic_timer.wait_time = hazard_spawn_min * 0.3
 	_frenetic_timer.start()
 
 func _on_frenetic_timer_timeout() -> void:
 	if _state != "playing" or not _bonus_active:
 		_frenetic_timer.stop()
 		return
-	_spawn_from(_bonus_scenes)
-	_frenetic_timer.wait_time = _rng.randf_range(FRENETIC_MIN, FRENETIC_MAX)
+	if _spondylus_to_spawn > 0 and (_rng.randf() < 0.25 or _bonus_countdown.time_left < _spondylus_to_spawn * 0.5):
+		_spondylus_to_spawn -= 1
+		_spawn_scene(_spondylus_scene)
+	else:
+		_spawn_from(_bonus_scenes)
+	_frenetic_timer.wait_time = _rng.randf_range(hazard_spawn_min * 0.25, hazard_spawn_max * 0.35)
 
 func _on_bonus_countdown_timeout() -> void:
 	_exit_bonus_level()
@@ -294,6 +443,7 @@ func _exit_bonus_level() -> void:
 	_bonus_active = false
 	_frenetic_timer.stop()
 	_bonus_countdown.stop()
+	_player.start_bonus_blink(false)
 	_bonus_label.visible = false
 	for node in get_tree().get_nodes_in_group("spawnable"):
 		node.queue_free()
@@ -307,6 +457,8 @@ func _on_difficulty_timer_timeout() -> void:
 	if _state != "playing":
 		return
 	scroll_speed *= DIFFICULTY_FACTOR
+	hazard_spawn_min *= 0.90
+	hazard_spawn_max *= 0.90
 
 # ── Game state ───────────────────────────────────────────────────────────────
 
@@ -314,6 +466,8 @@ func _update_ui() -> void:
 	_health_bar.value = _health
 	_lives_label.text = "Vidas: %d" % _lives
 	_score_label.text = "Puntos: %d" % _score
+	if _coins_label:
+		_coins_label.text = "Spondylus: %d / %d" % [_coins, _get_coins_to_pass()]
 
 func _lose_game() -> void:
 	_state = "lose"
@@ -332,7 +486,9 @@ func _end_game(message: String) -> void:
 		node.queue_free()
 	for child in _decorations_root.get_children():
 		child.queue_free()
-	HighScoreManager.save_score(_score, false)
+	HighScoreManager.save_score(_current_map, _score, _coins)
+	SettingsManager.ancestral_energy += _score
+	SettingsManager.save_settings()
 	_state_label.text = message
 	_state_label.visible = true
 	_btn_reintentar.visible = true
@@ -374,7 +530,32 @@ func _play_sfx(stream: AudioStream) -> void:
 # ── Navigation ───────────────────────────────────────────────────────────────
 
 func _on_reintentar_pressed() -> void:
+	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_menu_principal_pressed() -> void:
+	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+
+func _on_btn_dodge_pressed() -> void:
+	if _state == "playing" and _player:
+		_player.do_dodge()
+
+func _on_btn_pausa_pressed() -> void:
+	_toggle_pause()
+
+func _toggle_pause() -> void:
+	if _state == "lose": return
+	var p := not get_tree().paused
+	get_tree().paused = p
+	var pm = get_node_or_null("HUD/PauseMenu")
+	if pm:
+		pm.visible = p
+
+func _on_btn_reanudar_pressed() -> void:
+	get_tree().paused = false
+	var pm = get_node_or_null("HUD/PauseMenu")
+	if pm:
+		pm.visible = false
+
+

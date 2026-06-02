@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dlvlselect001"]
 
-[ext_resource type="Script" path="res://scripts/level_select.gd" id="1_ls"]
+[ext_resource type="Script" uid="uid://blhsocgcegic5" path="res://scripts/level_select.gd" id="1_ls"]
 [ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://sprites/char_menu.png" id="3_player"]
+[ext_resource type="Texture2D" uid="uid://duiv4l4lfljiv" path="res://sprites/char_menu.png" id="3_player"]
 
-[node name="LevelSelect" type="Control"]
+[node name="LevelSelect" type="Control" unique_id=1776216853]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ls")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=851749343]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,104 +23,69 @@ grow_vertical = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 
-[node name="Title" type="Label" parent="."]
+[node name="Title" type="Label" parent="." unique_id=1047306999]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 6.0
-offset_right = 290.0
-offset_bottom = 22.0
+offset_left = 39.0
+offset_top = 22.0
+offset_right = 289.0
+offset_bottom = 45.0
 text = "SELECCIONAR NIVEL"
 
-[node name="LevelList" type="VBoxContainer" parent="."]
+[node name="LevelList" type="VBoxContainer" parent="." unique_id=2016230766]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 26.0
-offset_right = 225.0
-offset_bottom = 188.0
+offset_left = 38.0
+offset_top = 47.0
+offset_right = 280.0
+offset_bottom = 209.0
 theme_override_constants/separation = 6
 
-[node name="BtnAmanecer" type="Button" parent="LevelList"]
+[node name="BtnAmanecer" type="Button" parent="LevelList" unique_id=970045298]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "🌅  AMANECER"
+text = "🌅  Las Costas de Jocay"
 alignment = 0
 
-[node name="BtnTarde" type="Button" parent="LevelList"]
+[node name="BtnTarde" type="Button" parent="LevelList" unique_id=1226287602]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "☀️  TARDE"
+text = "☀️  El Arrecife Spondylus"
 alignment = 0
 
-[node name="BtnAtardecer" type="Button" parent="LevelList"]
+[node name="BtnAtardecer" type="Button" parent="LevelList" unique_id=778723027]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "🌇  ATARDECER"
+text = "🌇  La Ruta de los Navegantes"
 alignment = 0
 
-[node name="BtnAnochecer" type="Button" parent="LevelList"]
+[node name="BtnAnochecer" type="Button" parent="LevelList" unique_id=1674356330]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "🌙  ANOCHECER"
+text = "🌙  El Santuario de Umiña"
 alignment = 0
 
-[node name="DiffLabel" type="Label" parent="."]
+[node name="BtnJugar" type="Button" parent="." unique_id=2029885164]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 193.0
-offset_right = 225.0
-offset_bottom = 206.0
-text = "— DIFICULTAD"
-
-[node name="DiffRow" type="HBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 40.0
-offset_top = 208.0
-offset_right = 225.0
-offset_bottom = 232.0
-theme_override_constants/separation = 5
-
-[node name="BtnFacil" type="Button" parent="DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "FÁCIL"
-
-[node name="BtnNormal" type="Button" parent="DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "NORMAL"
-
-[node name="BtnDificil" type="Button" parent="DiffRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "DIFÍCIL"
-
-[node name="BtnJugar" type="Button" parent="."]
-layout_mode = 0
-offset_left = 40.0
-offset_top = 237.0
-offset_right = 225.0
-offset_bottom = 255.0
+offset_left = 39.0
+offset_top = 214.0
+offset_right = 224.0
+offset_bottom = 245.0
 text = "¡JUGAR!"
-alignment = 1
 
-[node name="BtnVolver" type="Button" parent="."]
+[node name="BtnVolver" type="Button" parent="." unique_id=2110316326]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 257.0
-offset_right = 225.0
-offset_bottom = 268.0
+offset_left = 39.0
+offset_top = 245.0
+offset_right = 224.0
+offset_bottom = 276.0
 text = "← VOLVER"
 flat = true
 alignment = 0
 
-[node name="PlayerDisplay" type="TextureRect" parent="."]
+[node name="PlayerDisplay" type="TextureRect" parent="." unique_id=193653834]
 layout_mode = 0
 offset_left = 300.0
 offset_top = 30.0
