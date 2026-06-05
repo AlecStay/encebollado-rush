@@ -28,6 +28,10 @@ window/size/viewport_height=270
 window/stretch/mode="canvas_items"
 window/handheld/orientation="landscape"
 
+[gui]
+
+theme/custom_font="res://grapesoda_2/GrapeSoda.ttf"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/funplay_mcp/plugin.cfg")

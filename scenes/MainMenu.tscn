@@ -3,13 +3,17 @@
 [ext_resource type="Script" uid="uid://bvv7un5mdyws7" path="res://scripts/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_mainmenu"]
 [ext_resource type="Texture2D" uid="uid://saquq3n70amb" path="res://sprites/fish.svg" id="3_fish"]
-[ext_resource type="Texture2D" path="res://sprites/char_menu.png" id="4_player"]
+[ext_resource type="Texture2D" uid="uid://duiv4l4lfljiv" path="res://sprites/char_menu.png" id="4_player"]
 
 [node name="MainMenu" type="Control" unique_id=370869822]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -6.0
+offset_right = -8.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
@@ -20,9 +24,9 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 8.0
-offset_top = 8.0
+offset_top = 6.0
 offset_right = 8.0
-offset_bottom = 8.0
+offset_bottom = 6.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_mainmenu")
@@ -84,7 +88,7 @@ offset_bottom = 14.0
 texture = ExtResource("3_fish")
 stretch_mode = 5
 
-[node name="PlayerDisplay" type="TextureRect" parent="."]
+[node name="PlayerDisplay" type="TextureRect" parent="." unique_id=572830566]
 layout_mode = 0
 offset_left = 290.0
 offset_top = 30.0
