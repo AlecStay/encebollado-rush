@@ -23,6 +23,11 @@ const DIFFICULTY_PERIOD := 120.0    # segundos
 const DIFFICULTY_FACTOR := 1.15     # +15% por periodo
 const MAP_FADE_TIME     := 1.0
 
+const BOSS_SCENE := preload("res://scenes/Boss.tscn")
+const BOSS_MAPS  := {0: "boss1", 2: "boss2", 3: "boss3"}   # jefe al terminar estos mapas
+const BOSS_SOUND := {0: 0, 2: 1, 3: 2}                     # índice en _rare_streams (1/2/3.wav)
+const DODGE_DMG  := 7.0
+
 var _lives        := 3
 var _health       := 1.0
 var _score        := 0
@@ -35,6 +40,7 @@ var _level_passed := false
 var _bonus_active := false
 var _current_map  := 0
 var _spondylus_to_spawn := 0
+var _boss: Node = null
 var _rng          := RandomNumberGenerator.new()
 
 var _damage_fraction := DAMAGE_FRACTION
@@ -63,6 +69,11 @@ var _bonus_scenes: Array[PackedScene] = [
 var _golden_scene: PackedScene = preload("res://templates/golden.tscn")
 var _emerald_scene: PackedScene = preload("res://templates/emerald.tscn")
 var _spondylus_scene: PackedScene = preload("res://templates/spondylus.tscn")
+
+var _ost_stream: AudioStream
+var _lost_stream: AudioStream
+var _rare_streams: Array[AudioStream] = []
+var _rare_player: AudioStreamPlayer
 
 var _decor_scenes: Array[PackedScene] = [
 	preload("res://templates/decor_bubbles.tscn"),
@@ -104,6 +115,12 @@ const DECOR_SCROLL_FACTOR := 0.6
 @onready var _sun: Sprite2D       = $Background/Sun
 @onready var _water: TextureRect  = $Background/Water
 @onready var _sand: TextureRect   = $Background/Sand
+@onready var _map: TextureRect      = $BackgroundLayer/Map
+@onready var _map_fade: TextureRect = $BackgroundLayer/MapFade
+@onready var _boss_layer            = $BossLayer
+@onready var _boss_projectiles      = $BossProjectiles
+@onready var _boss_bar: ProgressBar = $HUD/BossBar
+@onready var _boss_name: Label      = $HUD/BossName
 
 func _ready() -> void:
 	_rng.randomize()
@@ -122,11 +139,11 @@ func _ready() -> void:
 	_apply_level_theme(_current_map, true)
 	_update_ui()
 	_setup_photo_popup()
+	_load_audio()
 	_start_music()
-	_bonus_label.add_theme_font_size_override("font_size", 18)
-	_bonus_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.0))
-	_bonus_label.add_theme_color_override("font_outline_color", Color(0.1, 0.1, 0.18))
-	_bonus_label.add_theme_constant_override("outline_size", 3)
+	_bonus_label.add_theme_font_size_override("font_size", 15)
+	_bonus_label.add_theme_color_override("font_color", Color(0.078, 0.071, 0.157))
+	_bonus_label.add_theme_constant_override("outline_size", 0)
 	_hazard_timer.timeout.connect(_on_hazard_timer_timeout)
 	_bonus_timer.timeout.connect(_on_bonus_timer_timeout)
 	_photo_timer.timeout.connect(_on_photo_timer_timeout)
@@ -173,16 +190,24 @@ func _apply_level_theme(idx: int, instant: bool) -> void:
 	else:
 		_sun.texture = load("res://sprites/sun.svg")
 	_sun.scale = Vector2(2.0, 2.0)
+	var map_path := "res://sprites/maps/level%d.png" % idx
+	var map_tex: Texture2D = load(map_path) if ResourceLoader.exists(map_path) else null
 	if instant:
-		_water.modulate        = lvl.water_modulate
-		_sand.modulate         = lvl.sand_modulate
-		_canvas_modulate.color = lvl.ambient
+		if map_tex:
+			_map.texture = map_tex
+		_canvas_modulate.color = Color.WHITE
 		_sun.position          = Vector2(lvl.sun_x, lvl.sun_y)
 		return
+	if map_tex:
+		_map_fade.texture = map_tex
+		_map_fade.modulate.a = 0.0
+		var ft := create_tween()
+		ft.tween_property(_map_fade, "modulate:a", 1.0, MAP_FADE_TIME)
+		ft.tween_callback(func():
+			_map.texture = map_tex
+			_map_fade.modulate.a = 0.0)
 	var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(_water, "modulate", lvl.water_modulate, MAP_FADE_TIME)
-	tween.tween_property(_sand,  "modulate", lvl.sand_modulate,  MAP_FADE_TIME)
-	tween.tween_property(_canvas_modulate, "color", lvl.ambient, MAP_FADE_TIME)
+	tween.tween_property(_canvas_modulate, "color", Color.WHITE, MAP_FADE_TIME)
 	tween.tween_property(_sun,   "position", Vector2(lvl.sun_x, lvl.sun_y), MAP_FADE_TIME)
 
 func _process(delta: float) -> void:
@@ -351,6 +376,7 @@ func _on_spawnable_touched(spawnable: Area2D) -> void:
 						if node.has_method("get_node"):
 							node.scroll_speed = scroll_speed * 0.5
 				"corviche":
+					_play_bomb_effect(_player.position)
 					for node in get_tree().get_nodes_in_group("spawnable"):
 						if node.get("is_hazard"): node.queue_free()
 
@@ -379,19 +405,26 @@ func _get_coins_to_pass() -> int:
 	else: return 40
 
 func _check_level_passed() -> void:
-	if _coins >= _get_coins_to_pass():
-		HighScoreManager.save_score(_current_map, _score, _coins)
-		_coins = 0
-		_level_passed = true
-		_state_label.text = "¡NIVEL COMPLETADO!\nYa puedes volver al inicio"
-		_state_label.visible = true
-		get_tree().create_timer(4.0).timeout.connect(func(): if _state != "lose": _state_label.visible = false)
-		_current_map = (_current_map + 1) % GameState.LEVELS.size()
-		SettingsManager.unlock_level(_current_map)
-		_apply_level_theme(_current_map, false)
-		scroll_speed *= 1.25
-		hazard_spawn_min *= 0.8
-		hazard_spawn_max *= 0.8
+	if _coins < _get_coins_to_pass():
+		return
+	if BOSS_MAPS.has(_current_map):
+		_start_boss(_current_map)
+	else:
+		_advance_level()
+
+func _advance_level() -> void:
+	HighScoreManager.save_score(_current_map, _score, _coins)
+	_coins = 0
+	_level_passed = true
+	_state_label.text = "¡NIVEL COMPLETADO!\nYa puedes volver al inicio"
+	_state_label.visible = true
+	get_tree().create_timer(4.0).timeout.connect(func(): if _state != "lose": _state_label.visible = false)
+	_current_map = (_current_map + 1) % GameState.LEVELS.size()
+	SettingsManager.unlock_level(_current_map)
+	_apply_level_theme(_current_map, false)
+	scroll_speed *= 1.25
+	hazard_spawn_min *= 0.8
+	hazard_spawn_max *= 0.8
 
 
 func _apply_damage() -> void:
@@ -404,6 +437,71 @@ func _apply_damage() -> void:
 		_lose_game()
 		return
 	_health = 1.0
+
+# ── Boss fight ───────────────────────────────────────────────────────────────
+
+func _start_boss(map: int) -> void:
+	_state = "boss"
+	_hazard_timer.stop()
+	_bonus_timer.stop()
+	_decor_timer.stop()
+	_frenetic_timer.stop()
+	_reset_combo()
+	for node in get_tree().get_nodes_in_group("spawnable"):
+		node.queue_free()
+	_boss = BOSS_SCENE.instantiate()
+	_boss_layer.add_child(_boss)
+	_boss.health_changed.connect(_on_boss_health_changed)
+	_boss.projectile_spawned.connect(_connect_boss_projectile)
+	_boss.defeated.connect(_on_boss_defeated.bind(map))
+	_boss.start(BOSS_MAPS[map], _boss_projectiles, _player)
+	_boss_name.text = _boss.display_name()
+	_boss_name.visible = true
+	_boss_bar.visible = true
+	_boss_bar.value = 1.0
+	_state_label.text = "¡JEFE!"
+	_state_label.visible = true
+	get_tree().create_timer(1.5).timeout.connect(func(): if _state == "boss": _state_label.visible = false)
+
+func _connect_boss_projectile(proj) -> void:
+	proj.hit.connect(_on_boss_projectile_hit)
+
+func _on_boss_projectile_hit(proj) -> void:
+	if _state != "boss":
+		return
+	if _player.is_dodging:
+		if _boss and is_instance_valid(_boss):
+			_boss.take_damage(DODGE_DMG)
+		_player.refund_dodge()
+		_increment_combo()
+		proj.queue_free()
+		return
+	if _player.is_invulnerable():
+		return
+	_reset_combo()
+	_apply_damage()
+	_play_sfx(hit_sfx)
+	proj.queue_free()
+
+func _on_boss_health_changed(ratio: float) -> void:
+	_boss_bar.value = ratio
+
+func _on_boss_defeated(map: int) -> void:
+	_play_boss_sound(BOSS_SOUND.get(map, 0))
+	for p in _boss_projectiles.get_children():
+		p.queue_free()
+	_boss = null
+	_boss_bar.visible = false
+	_boss_name.visible = false
+	var is_last := (map == GameState.LEVELS.size() - 1)
+	_advance_level()
+	if is_last:
+		_state_label.text = "¡JUEGO COMPLETADO!"
+		_state_label.visible = true
+	_state = "playing"
+	_schedule_hazard()
+	_schedule_bonus()
+	_schedule_decor()
 
 # ── Bonus level ──────────────────────────────────────────────────────────────
 
@@ -464,13 +562,16 @@ func _on_difficulty_timer_timeout() -> void:
 
 func _update_ui() -> void:
 	_health_bar.value = _health
-	_lives_label.text = "Vidas: %d" % _lives
-	_score_label.text = "Puntos: %d" % _score
+	_lives_label.text = "%d" % _lives
+	_score_label.text = "%d" % _score
 	if _coins_label:
-		_coins_label.text = "Spondylus: %d / %d" % [_coins, _get_coins_to_pass()]
+		_coins_label.text = "%d / %d" % [_coins, _get_coins_to_pass()]
 
 func _lose_game() -> void:
 	_state = "lose"
+	_music_player.stop()
+	if _lost_stream:
+		_play_sfx(_lost_stream)
 	_end_game("GAME OVER")
 
 func _end_game(message: String) -> void:
@@ -486,6 +587,13 @@ func _end_game(message: String) -> void:
 		node.queue_free()
 	for child in _decorations_root.get_children():
 		child.queue_free()
+	if _boss and is_instance_valid(_boss):
+		_boss.queue_free()
+		_boss = null
+	for p in _boss_projectiles.get_children():
+		p.queue_free()
+	_boss_bar.visible = false
+	_boss_name.visible = false
 	HighScoreManager.save_score(_current_map, _score, _coins)
 	SettingsManager.ancestral_energy += _score
 	SettingsManager.save_settings()
@@ -513,11 +621,23 @@ func _on_photo_timer_timeout() -> void:
 
 # ── Audio ────────────────────────────────────────────────────────────────────
 
+func _load_audio() -> void:
+	if ResourceLoader.exists("res://music/ost.wav"):  _ost_stream  = load("res://music/ost.wav")
+	if ResourceLoader.exists("res://music/lost.wav"): _lost_stream = load("res://music/lost.wav")
+	for p in ["res://music/1.wav", "res://music/2.wav", "res://music/3.wav"]:
+		if ResourceLoader.exists(p): _rare_streams.append(load(p))
+	# dedicated player so the jingle isn't cut off by hit/bonus SFX on _sfx_player
+	_rare_player = AudioStreamPlayer.new()
+	$Audio.add_child(_rare_player)
+
 func _start_music() -> void:
-	if not music_stream:
+	var stream = music_stream if music_stream else _ost_stream
+	if not stream:
 		return
-	_music_player.stream    = music_stream
+	_music_player.stream    = stream
 	_music_player.volume_db = SettingsManager.get_music_db()
+	if not _music_player.finished.is_connected(_start_music):
+		_music_player.finished.connect(_start_music)
 	_music_player.play()
 
 func _play_sfx(stream: AudioStream) -> void:
@@ -526,6 +646,35 @@ func _play_sfx(stream: AudioStream) -> void:
 	_sfx_player.stream    = stream
 	_sfx_player.volume_db = SettingsManager.get_sfx_db()
 	_sfx_player.play()
+
+func _play_boss_sound(index: int) -> void:
+	if index < 0 or index >= _rare_streams.size() or not _rare_player:
+		return
+	_rare_player.stream    = _rare_streams[index]
+	_rare_player.volume_db = SettingsManager.get_sfx_db()
+	_rare_player.play()
+
+# ── VFX ────────────────────────────────────────────────────────────────────────
+
+func _play_bomb_effect(center: Vector2) -> void:
+	# Touhou-style screen-clear: an expanding shockwave from the player plus a
+	# quick screen flash. Both nodes free themselves when the tween/anim ends.
+	var wave := Node2D.new()
+	wave.set_script(preload("res://scripts/bomb_wave.gd"))
+	wave.position = center
+	wave.z_index  = 100
+	add_child(wave)
+	wave.start(360.0, 0.5, Color(0.45, 0.9, 1.0))
+
+	var flash := ColorRect.new()
+	flash.color = Color(1.0, 1.0, 1.0, 0.55)
+	flash.anchor_right  = 1.0
+	flash.anchor_bottom = 1.0
+	flash.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.3)
+	tw.tween_callback(flash.queue_free)
 
 # ── Navigation ───────────────────────────────────────────────────────────────
 
@@ -538,7 +687,7 @@ func _on_menu_principal_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
 
 func _on_btn_dodge_pressed() -> void:
-	if _state == "playing" and _player:
+	if (_state == "playing" or _state == "boss") and _player:
 		_player.do_dodge()
 
 func _on_btn_pausa_pressed() -> void:
@@ -557,5 +706,16 @@ func _on_btn_reanudar_pressed() -> void:
 	var pm = get_node_or_null("HUD/PauseMenu")
 	if pm:
 		pm.visible = false
+
+# ── Debug hooks (called by the DebugCommands autoload) ─────────────────────────
+
+func debug_complete_level() -> void:
+	if _state != "playing":
+		return
+	_coins = _get_coins_to_pass()
+	_check_level_passed()
+
+func debug_refresh() -> void:
+	_update_ui()
 
 

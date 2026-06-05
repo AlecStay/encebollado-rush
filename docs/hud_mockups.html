@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Jocay Surf Rush — HUD mockups</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root{
+    --cream:#E8E8D1; --gold:#FFD900; --orange:#FF6B36; --navy:#1A1A2E;
+    --scale:2.6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#0b0d16;
+    background-image:radial-gradient(circle at 50% -10%, #1b2140 0%, #0b0d16 60%);
+    font-family:'Press Start 2P',monospace; color:var(--cream);
+    padding:34px; display:flex; flex-direction:column; gap:40px; align-items:center;
+  }
+  h1{font-size:18px;color:var(--gold);text-shadow:2px 2px 0 var(--navy);letter-spacing:1px}
+  .sub{font-size:9px;color:#8b93b8;margin-top:12px;line-height:1.8;text-align:center}
+
+  .concept{width:calc(480px * var(--scale))}
+  .cap{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .cap .n{font-size:13px;color:var(--gold);text-shadow:2px 2px 0 var(--navy)}
+  .cap .t{font-size:9px;color:#aab2d6;line-height:1.7}
+
+  .frame{
+    width:calc(480px * var(--scale)); height:calc(270px * var(--scale));
+    position:relative; overflow:hidden; border-radius:4px;
+    border:3px solid #2a2e48; box-shadow:0 14px 40px rgba(0,0,0,.6);
+  }
+  .screen{
+    position:absolute; top:0; left:0; width:480px; height:270px;
+    transform:scale(var(--scale)); transform-origin:top left;
+    image-rendering:pixelated; font-family:'Press Start 2P',monospace;
+  }
+
+  /* ---------- backgrounds ---------- */
+  .bg{position:absolute;inset:0}
+  .sand{position:absolute;top:0;left:0;right:0;height:40px}
+  .sun{position:absolute;width:34px;height:34px;border-radius:50%}
+  .star{position:absolute;width:1px;height:1px;background:#cfd6ff;opacity:.85}
+
+  .bg-reef   {background:linear-gradient(#bfe9ef 0 14%, #6cc0d8 40%, #2f88ad 100%)}
+  .bg-reef   .sand{background:linear-gradient(#fff0c2,#ffe49a)}
+  .bg-reef   .sun{left:60px;top:46px;background:radial-gradient(#fff6d6,#ffe27a);box-shadow:0 0 18px #ffe27a}
+  .bg-sunset {background:linear-gradient(#ffb27a 0 16%, #ff8a52 45%, #d8542c 100%)}
+  .bg-sunset .sand{background:linear-gradient(#ffc285,#ff9a52)}
+  .bg-sunset .sun{right:60px;top:54px;background:radial-gradient(#fff1c8,#ff8a3a);box-shadow:0 0 22px #ff7a2a}
+  .bg-night  {background:linear-gradient(#3a4790 0 14%, #232c63 45%, #121838 100%)}
+  .bg-night  .sand{background:linear-gradient(#414a78,#2c3357)}
+  .bg-night  .sun{right:70px;top:40px;background:radial-gradient(#eef2ff,#aab6e6);box-shadow:0 0 16px #9fb0e6}
+
+  /* surfer placeholder */
+  .surfer{position:absolute;left:224px;top:150px;width:34px;height:42px;transform:rotate(-7deg)}
+  .surfer .foam{position:absolute;left:-4px;bottom:-3px;width:42px;height:16px;border-radius:50%;
+    background:radial-gradient(rgba(255,255,255,.85),rgba(255,255,255,0) 70%)}
+  .surfer .board{position:absolute;bottom:0;left:8px;width:18px;height:38px;border-radius:50%/42%;
+    background:linear-gradient(#ffd98a,#d98a3a);border:2px solid var(--navy)}
+  .surfer .rider{position:absolute;top:4px;left:12px;width:10px;height:16px;border-radius:4px;
+    background:var(--orange);border:2px solid var(--navy)}
+
+  /* ---------- shared HUD type ---------- */
+  .px{font-family:'Press Start 2P',monospace;color:var(--cream);
+    text-shadow:1px 1px 0 var(--navy),-1px -1px 0 var(--navy),1px -1px 0 var(--navy),-1px 1px 0 var(--navy)}
+  .gold{color:var(--gold)} .orange{color:var(--orange)}
+  .hud{position:absolute;inset:0}
+  .seg{display:flex;gap:1px}
+  .seg i{width:9px;height:5px;background:var(--cream);border:1px solid var(--navy);display:block}
+  .seg i.off{background:rgba(10,12,24,.55)}
+  .board-ic{width:5px;height:13px;border-radius:50%/45%;background:var(--gold);border:1px solid var(--navy);display:inline-block}
+  .heart{width:8px;height:7px;background:var(--orange);
+    clip-path:polygon(50% 100%,0 35%,15% 0,50% 20%,85% 0,100% 35%)}
+
+  /* cooldown ring */
+  .ring{position:relative;border-radius:50%}
+  .ring::after{content:"";position:absolute;inset:3px;border-radius:50%}
+
+  /* ============ Concept 1 — Tótem ============ */
+  .c1-tl{position:absolute;left:8px;top:8px;padding:5px 7px;background:rgba(18,16,30,.74);
+    border:2px solid var(--gold);box-shadow:0 0 0 2px var(--navy),3px 3px 0 rgba(0,0,0,.4)}
+  .c1-tl .row{display:flex;align-items:center;gap:4px;margin-bottom:4px}
+  .c1-tl .lab{font-size:5px;color:#c9b56a}
+  .c1-score{font-size:8px;margin-top:2px}
+  .c1-top{position:absolute;left:50%;top:7px;transform:translateX(-50%);text-align:center;
+    padding:4px 10px;background:rgba(18,16,30,.74);border:2px solid var(--gold);
+    box-shadow:0 0 0 2px var(--navy)}
+  .c1-top .shell{font-size:14px}
+  .c1-top .num{font-size:11px;margin-left:4px}
+  .c1-top .lab{font-size:5px;color:#c9b56a;margin-top:3px;letter-spacing:1px}
+  .c1-pause{position:absolute;right:8px;top:8px;width:24px;height:24px;background:rgba(18,16,30,.8);
+    border:2px solid var(--gold);box-shadow:0 0 0 2px var(--navy);display:flex;gap:3px;
+    align-items:center;justify-content:center}
+  .c1-pause b{width:4px;height:12px;background:var(--cream);display:block}
+  .c1-dodge{position:absolute;right:12px;bottom:14px;width:46px;height:46px}
+  .c1-dodge .ring{width:46px;height:46px;
+    background:conic-gradient(var(--gold) 0 100%, rgba(0,0,0,.5) 0)}
+  .c1-dodge .ring::after{background:radial-gradient(#3a2c1c,#241a12);border:2px solid var(--navy)}
+  .c1-dodge .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;font-size:7px}
+  .c1-dodge .gems{position:absolute;left:0;right:0;bottom:5px;display:flex;gap:3px;justify-content:center}
+  .c1-dodge .gem{width:5px;height:5px;background:var(--gold);transform:rotate(45deg);border:1px solid var(--navy)}
+  .c1-combo{position:absolute;left:10px;bottom:16px;transform:rotate(-5deg);text-align:left}
+  .c1-combo .a{font-size:6px;color:var(--gold)}
+  .c1-combo .b{font-size:13px;color:var(--orange);margin-top:2px}
+
+  /* ============ Concept 2 — Mínimal ============ */
+  .c2-tl{position:absolute;left:10px;top:9px}
+  .c2-tl .hearts{display:flex;gap:3px;margin-bottom:5px}
+  .c2-tl .hp{display:flex;gap:1px;margin-bottom:5px}
+  .c2-tl .hp i{width:11px;height:3px;background:var(--cream)}
+  .c2-tl .hp i.off{background:rgba(255,255,255,.25)}
+  .c2-tl .sc{font-size:8px}
+  .c2-obj{position:absolute;left:50%;top:11px;transform:translateX(-50%);text-align:center;width:130px}
+  .c2-obj .t{font-size:6px;letter-spacing:1px;color:#f3eecf}
+  .c2-obj .bar{margin-top:5px;height:2px;background:rgba(255,255,255,.22)}
+  .c2-obj .bar i{display:block;height:2px;width:35%;background:var(--gold)}
+  .c2-pause{position:absolute;right:11px;top:11px;display:flex;gap:3px}
+  .c2-pause b{width:3px;height:13px;background:var(--cream);display:block;opacity:.92}
+  .c2-dodge{position:absolute;right:14px;bottom:16px;width:40px;height:40px}
+  .c2-dodge .ring{width:40px;height:40px;
+    background:conic-gradient(var(--gold) 0 60%, rgba(255,255,255,.18) 60% 100%)}
+  .c2-dodge .ring::after{background:rgba(11,13,22,.35);border:1px solid rgba(255,255,255,.5)}
+  .c2-dodge .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px}
+  .c2-dodge .dots{position:absolute;left:0;right:0;bottom:-7px;display:flex;gap:3px;justify-content:center}
+  .c2-dodge .dots i{width:4px;height:4px;border-radius:50%;background:var(--gold)}
+  .c2-dodge .dots i.off{background:rgba(255,255,255,.3)}
+  .c2-buffs{position:absolute;left:12px;bottom:14px;display:flex;gap:4px}
+  .c2-buffs .p{width:16px;height:16px;border:1px solid rgba(255,255,255,.55);
+    display:flex;align-items:center;justify-content:center;font-size:6px;background:rgba(11,13,22,.3)}
+
+  /* ============ Concept 3 — Cresta ============ */
+  .c3-top{position:absolute;left:50%;top:8px;transform:translateX(-50%);text-align:center;width:230px}
+  .c3-top .score{font-size:13px}
+  .c3-top .objwrap{margin-top:5px;height:9px;border-radius:5px;background:rgba(11,16,38,.62);
+    border:1px solid rgba(255,255,255,.18);position:relative;overflow:hidden}
+  .c3-top .objwrap i{position:absolute;left:0;top:0;bottom:0;width:35%;
+    background:linear-gradient(90deg,#2f88ad,#5fd0e6);border-right:1px solid #bff0ff}
+  .c3-top .objtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:5px;letter-spacing:1px}
+  .c3-tl{position:absolute;left:8px;top:26px;padding:5px 6px;border-radius:5px;
+    background:rgba(11,16,38,.6);border:1px solid rgba(255,255,255,.16)}
+  .c3-tl .row{display:flex;align-items:center;gap:4px}
+  .c3-tl .row+.row{margin-top:4px}
+  .c3-pause{position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:6px;
+    background:rgba(11,16,38,.62);border:1px solid rgba(255,255,255,.18);
+    display:flex;gap:3px;align-items:center;justify-content:center}
+  .c3-pause b{width:4px;height:11px;background:var(--cream);display:block;border-radius:1px}
+  .c3-dodge{position:absolute;right:12px;bottom:13px;width:52px;height:52px}
+  .c3-dodge .ring{width:52px;height:52px;
+    background:conic-gradient(var(--orange) 0 100%, rgba(0,0,0,.45) 0)}
+  .c3-dodge .ring::after{background:radial-gradient(#243a5e,#16243e);border:1px solid rgba(255,255,255,.25)}
+  .c3-dodge .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;font-size:7px}
+  .c3-dodge .lbl small{font-size:6px;color:var(--gold);margin-top:3px}
+  .c3-buffs{position:absolute;left:10px;bottom:12px;display:flex;gap:6px}
+  .c3-buffs .b{position:relative;width:20px;height:20px}
+  .c3-buffs .b .ring{width:20px;height:20px}
+  .c3-buffs .b.ceviche .ring{background:conic-gradient(var(--gold) 0 60%, rgba(0,0,0,.4) 0)}
+  .c3-buffs .b.emerald .ring{background:conic-gradient(#54e6c8 0 80%, rgba(0,0,0,.4) 0)}
+  .c3-buffs .b .ring::after{background:#14203a}
+  .c3-buffs .b span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6px}
+  .c3-bonus{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);text-align:center;
+    padding:4px 12px;border-radius:6px;background:rgba(11,16,38,.5);border:1px solid var(--gold)}
+  .c3-bonus .a{font-size:9px;color:var(--gold)} .c3-bonus .b{font-size:7px;margin-top:3px}
+</style>
+</head>
+<body>
+  <h1>JOCAY SURF RUSH — HUD MOCKUPS</h1>
+  <div class="sub">3 directions · same data, different philosophy · each shown over a different level mood<br>
+  480×270 native (shown ×2.6) · palette #E8E8D1 / #FFD900 / #FF6B36 / #1A1A2E</div>
+
+  <!-- ============ CONCEPT 1 ============ -->
+  <div class="concept">
+    <div class="cap"><span class="n">01 — TÓTEM ANCESTRAL</span>
+      <span class="t">Diegetic, carved Spondylus/totem framing, gold filigree. Leans into the theme.</span></div>
+    <div class="frame">
+      <div class="screen">
+        <div class="bg bg-sunset"><div class="sand"></div><div class="sun"></div></div>
+        <div class="surfer"><div class="foam"></div><div class="board"></div><div class="rider"></div></div>
+        <div class="hud">
+          <div class="c1-tl">
+            <div class="row"><span class="lab px">VIDA</span>
+              <span class="seg"><i></i><i></i><i></i><i class="off"></i></span></div>
+            <div class="row"><span class="lab px">x3</span>
+              <span class="board-ic"></span><span class="board-ic"></span><span class="board-ic"></span></div>
+            <div class="c1-score px">PUNTOS <span class="gold">12,450</span></div>
+          </div>
+          <div class="c1-top">
+            <div><span class="shell">🐚</span><span class="num px gold">7/20</span></div>
+            <div class="lab px">SPONDYLUS</div>
+          </div>
+          <div class="c1-pause"><b></b><b></b></div>
+          <div class="c1-dodge">
+            <div class="ring"></div>
+            <div class="lbl px">SALTO</div>
+            <div class="gems"><span class="gem"></span><span class="gem"></span></div>
+          </div>
+          <div class="c1-combo">
+            <div class="a px">¡ESQUIVE PERFECTO!</div>
+            <div class="b px">COMBO x0.7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONCEPT 2 ============ -->
+  <div class="concept">
+    <div class="cap"><span class="n">02 — MÍNIMAL MAREA</span>
+      <span class="t">Hairline pills, mostly cream, gold only on the objective. Quiet, glanceable, max play area.</span></div>
+    <div class="frame">
+      <div class="screen">
+        <div class="bg bg-reef"><div class="sand"></div><div class="sun"></div></div>
+        <div class="surfer"><div class="foam"></div><div class="board"></div><div class="rider"></div></div>
+        <div class="hud">
+          <div class="c2-tl">
+            <div class="hearts"><div class="heart"></div><div class="heart"></div><div class="heart"></div></div>
+            <div class="hp"><i></i><i></i><i></i><i class="off"></i></div>
+            <div class="sc px">12,450</div>
+          </div>
+          <div class="c2-obj">
+            <div class="t px">SPONDYLUS&nbsp;&nbsp;<span class="gold">7/20</span></div>
+            <div class="bar"><i></i></div>
+          </div>
+          <div class="c2-pause"><b></b><b></b></div>
+          <div class="c2-dodge">
+            <div class="ring"></div>
+            <div class="lbl px">1</div>
+            <div class="dots"><i></i><i class="off"></i></div>
+          </div>
+          <div class="c2-buffs">
+            <div class="p px gold">x2</div>
+            <div class="p px">🛡</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONCEPT 3 ============ -->
+  <div class="concept">
+    <div class="cap"><span class="n">03 — CRESTA HUD</span>
+      <span class="t">Bold translucent panels, full-width wave objective, big thumb dodge, buff timer rings. Mobile-first.</span></div>
+    <div class="frame">
+      <div class="screen">
+        <div class="bg bg-night"><div class="sand"></div><div class="sun"></div>
+          <div class="star" style="left:120px;top:20px"></div><div class="star" style="left:300px;top:14px"></div>
+          <div class="star" style="left:210px;top:30px"></div><div class="star" style="left:360px;top:26px"></div>
+          <div class="star" style="left:90px;top:34px"></div></div>
+        <div class="surfer"><div class="foam"></div><div class="board"></div><div class="rider"></div></div>
+        <div class="hud">
+          <div class="c3-top">
+            <div class="score px">12,450</div>
+            <div class="objwrap"><i></i><div class="objtxt px">SPONDYLUS 7 / 20</div></div>
+          </div>
+          <div class="c3-tl">
+            <div class="row"><span class="seg"><i></i><i></i><i></i><i class="off"></i></span></div>
+            <div class="row"><span class="board-ic"></span><span class="board-ic"></span><span class="board-ic"></span></div>
+          </div>
+          <div class="c3-pause"><b></b><b></b></div>
+          <div class="c3-bonus">
+            <div class="a px">¡NIVEL BONUS!</div><div class="b px gold">12s</div>
+          </div>
+          <div class="c3-dodge">
+            <div class="ring"></div>
+            <div class="lbl px">SALTO<small>2/2</small></div>
+          </div>
+          <div class="c3-buffs">
+            <div class="b ceviche"><div class="ring"></div><span class="px gold">x2</span></div>
+            <div class="b emerald"><div class="ring"></div><span class="px">🛡</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">open in a browser to compare · maps 1:1 to Godot anchors (top-left / top-center / top-right / bottom-left / bottom-right clusters)</div>
+</body>
+</html>

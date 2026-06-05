@@ -79,4 +79,4 @@ func _on_settings_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/Settings.tscn")
 
 func _on_appearance_pressed() -> void:
-	print("Navigating to Appearance")
+	get_tree().change_scene_to_file("res://scenes/Appearance.tscn")

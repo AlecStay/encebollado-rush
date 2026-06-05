@@ -7,7 +7,9 @@ const _COLOR_SHADOW  := Color(0.10, 0.10, 0.18)
 const _COLOR_SECTION := Color(1.00, 0.85, 0.00)
 
 @onready var _music_slider:  HSlider     = $SettingsBox/MusicRow/MusicSlider
-
+@onready var _music_pct:     Label       = $SettingsBox/MusicRow/MusicPct
+@onready var _sfx_slider:    HSlider     = $SettingsBox/SfxRow/SfxSlider
+@onready var _sfx_pct:       Label       = $SettingsBox/SfxRow/SfxPct
 
 @onready var _btn_volver:    Button      = $BtnVolver
 @onready var _box:           VBoxContainer = $SettingsBox
@@ -54,7 +56,6 @@ func _apply_theme() -> void:
 	for lbl: Label in [
 		$SettingsBox/MusicRow/MusicLabel,
 		$SettingsBox/SfxRow/SfxLabel,
-		$SettingsBox/FullscreenRow/FsLabel,
 		_music_pct, _sfx_pct,
 	]:
 		lbl.add_theme_color_override("font_color", _COLOR_NORMAL)

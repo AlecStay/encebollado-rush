@@ -1,9 +1,58 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://templates/player.tscn" id="2_player"]
 [ext_resource type="Texture2D" path="res://sprites/water_tile.svg" id="3_water"]
 [ext_resource type="Texture2D" path="res://sprites/sand_tile.svg" id="4_sand"]
+[ext_resource type="Theme" path="res://themes/hud_theme.tres" id="5_theme"]
+[ext_resource type="Texture2D" path="res://sprites/ui_heart.png" id="6_heart"]
+[ext_resource type="Texture2D" path="res://sprites/ui_shell.png" id="7_shell"]
+
+[sub_resource type="StyleBoxFlat" id="boss_fill"]
+bg_color = Color(0.85, 0.16, 0.2, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="boss_bg"]
+bg_color = Color(0.08, 0.08, 0.13, 0.7)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="pill_gold"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(0.988, 0.8, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.047, 0.047, 0.118, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="btn_dark"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.078, 0.078, 0.157, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.878, 0.69, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -11,22 +60,49 @@ script = ExtResource("1_main")
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color(1, 1, 1, 1)
 
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Map" type="TextureRect" parent="BackgroundLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 0
+
+[node name="MapFade" type="TextureRect" parent="BackgroundLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+modulate = Color(1, 1, 1, 0)
+expand_mode = 1
+stretch_mode = 0
+
 [node name="Background" type="Node2D" parent="."]
 
 [node name="Water" type="TextureRect" parent="Background"]
+visible = false
 texture_repeat = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = 0.0
 offset_top = 0.0
-offset_right = 480.0
-offset_bottom = 270.0
+offset_right = 0.0
+offset_bottom = 0.0
 texture = ExtResource("3_water")
 stretch_mode = 1
 
 [node name="Sand" type="TextureRect" parent="Background"]
+visible = false
 texture_repeat = 2
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
 offset_left = 0.0
 offset_top = 0.0
-offset_right = 480.0
+offset_right = 0.0
 offset_bottom = 40.0
 texture = ExtResource("4_sand")
 stretch_mode = 1
@@ -37,6 +113,10 @@ position = Vector2(240, 12)
 [node name="Decorations" type="Node2D" parent="."]
 
 [node name="Spawnables" type="Node2D" parent="."]
+
+[node name="BossLayer" type="Node2D" parent="."]
+
+[node name="BossProjectiles" type="Node2D" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(240, 200)
@@ -68,36 +148,129 @@ wait_time = 1.2
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
+[node name="BossBar" type="ProgressBar" parent="HUD"]
+visible = false
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 40.0
+offset_top = 5.0
+offset_right = -40.0
+offset_bottom = 12.0
+theme_override_styles/background = SubResource("boss_bg")
+theme_override_styles/fill = SubResource("boss_fill")
+max_value = 1.0
+step = 0.001
+value = 1.0
+show_percentage = false
+
+[node name="BossName" type="Label" parent="HUD"]
+visible = false
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 0.0
+offset_top = 13.0
+offset_right = 0.0
+offset_bottom = 27.0
+theme_override_colors/font_color = Color(1, 0.85, 0, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.18, 1)
+theme_override_constants/outline_size = 3
+horizontal_alignment = 1
+text = "JEFE"
+
 [node name="HealthBar" type="ProgressBar" parent="HUD"]
+theme = ExtResource("5_theme")
 offset_left = 12.0
 offset_top = 10.0
-offset_right = 172.0
-offset_bottom = 24.0
+offset_right = 162.0
+offset_bottom = 26.0
 min_value = 0.0
 max_value = 1.0
 step = 0.01
 value = 1.0
+show_percentage = false
+
+[node name="Seg1" type="ColorRect" parent="HUD/HealthBar"]
+anchor_left = 0.25
+anchor_right = 0.25
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = 1.0
+mouse_filter = 2
+color = Color(0.047, 0.047, 0.118, 1)
+
+[node name="Seg2" type="ColorRect" parent="HUD/HealthBar"]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = 1.0
+mouse_filter = 2
+color = Color(0.047, 0.047, 0.118, 1)
+
+[node name="Seg3" type="ColorRect" parent="HUD/HealthBar"]
+anchor_left = 0.75
+anchor_right = 0.75
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = 1.0
+mouse_filter = 2
+color = Color(0.047, 0.047, 0.118, 1)
+
+[node name="HeartIcon" type="TextureRect" parent="HUD"]
+offset_left = 12.0
+offset_top = 31.0
+offset_right = 28.0
+offset_bottom = 46.0
+texture = ExtResource("6_heart")
+stretch_mode = 3
 
 [node name="LivesLabel" type="Label" parent="HUD"]
-offset_left = 12.0
-offset_top = 28.0
-offset_right = 172.0
-offset_bottom = 44.0
-text = "Vidas: 3"
+offset_left = 33.0
+offset_top = 27.0
+offset_right = 130.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.957, 0.949, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+vertical_alignment = 1
+text = "3"
 
 [node name="ScoreLabel" type="Label" parent="HUD"]
-offset_left = 12.0
-offset_top = 44.0
-offset_right = 172.0
-offset_bottom = 60.0
-text = "Puntos: 0"
+offset_left = 10.0
+offset_top = 51.0
+offset_right = 250.0
+offset_bottom = 93.0
+theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
+theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 34
+vertical_alignment = 1
+text = "0"
+
+[node name="ShellIcon" type="TextureRect" parent="HUD"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 8.0
+offset_right = -32.0
+offset_bottom = 24.0
+texture = ExtResource("7_shell")
+stretch_mode = 3
 
 [node name="CoinsLabel" type="Label" parent="HUD"]
-offset_left = 12.0
-offset_top = 60.0
-offset_right = 172.0
-offset_bottom = 76.0
-text = "Spondylus: 0 / 20"
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -27.0
+offset_top = 6.0
+offset_right = 90.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
+theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
+text = "0 / 20"
 
 [node name="ComboLabel" type="Label" parent="HUD"]
 visible = false
@@ -113,36 +286,70 @@ text = "Esquive Perfecto!!
 Combo x0.1"
 
 [node name="BtnPausa" type="Button" parent="HUD"]
-offset_left = 420.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -52.0
 offset_top = 10.0
-offset_right = 470.0
-offset_bottom = 35.0
+offset_right = -10.0
+offset_bottom = 42.0
+theme = ExtResource("5_theme")
+theme_override_styles/normal = SubResource("btn_dark")
+theme_override_styles/hover = SubResource("btn_dark")
+theme_override_styles/pressed = SubResource("btn_dark")
+theme_override_colors/font_color = Color(0.957, 0.949, 0.86, 1)
+theme_override_colors/font_hover_color = Color(0.988, 0.8, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.988, 0.8, 0, 1)
+theme_override_font_sizes/font_size = 16
 text = "II"
 
 [node name="BtnDodge" type="Button" parent="HUD"]
-offset_left = 380.0
-offset_top = 190.0
-offset_right = 460.0
-offset_bottom = 250.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -80.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme = ExtResource("5_theme")
+theme_override_font_sizes/font_size = 14
 text = "Salto"
 
 [node name="DodgeBar" type="ProgressBar" parent="HUD"]
-offset_left = 380.0
-offset_top = 175.0
-offset_right = 460.0
-offset_bottom = 185.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -92.0
+offset_right = -20.0
+offset_bottom = -84.0
+theme = ExtResource("5_theme")
 mouse_filter = 2
 max_value = 1.0
 step = 0.01
 value = 1.0
 show_percentage = false
 
-[node name="PauseMenu" type="Panel" parent="HUD"]
+[node name="PauseMenu" type="Control" parent="HUD"]
 process_mode = 2
 visible = false
-offset_right = 480.0
-offset_bottom = 270.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 z_index = 100
+theme = ExtResource("5_theme")
 
 [node name="ColorRect" type="ColorRect" parent="HUD/PauseMenu"]
 layout_mode = 1
@@ -151,78 +358,156 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.6)
+color = Color(0.03, 0.03, 0.07, 0.66)
+
+[node name="Card" type="Panel" parent="HUD/PauseMenu"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -110.0
+offset_right = 120.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitlePausa" type="Label" parent="HUD/PauseMenu"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -100.0
+offset_right = 120.0
+offset_bottom = -72.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
+theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "PAUSA"
 
 [node name="BtnReanudar" type="Button" parent="HUD/PauseMenu"]
-offset_left = 180.0
-offset_top = 80.0
-offset_right = 300.0
-offset_bottom = 110.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -55.0
+offset_right = 60.0
+offset_bottom = -25.0
 text = "Reanudar"
 
 [node name="LabelMusic" type="Label" parent="HUD/PauseMenu"]
-offset_left = 150.0
-offset_top = 120.0
-offset_right = 210.0
-offset_bottom = 140.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = -15.0
+offset_right = -30.0
+offset_bottom = 5.0
 text = "Música"
 
 [node name="MusicSlider" type="HSlider" parent="HUD/PauseMenu"]
-offset_left = 220.0
-offset_top = 120.0
-offset_right = 330.0
-offset_bottom = 140.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -15.0
+offset_right = 90.0
+offset_bottom = 5.0
 max_value = 1.0
 step = 0.01
 value = 0.8
 
 [node name="LabelSfx" type="Label" parent="HUD/PauseMenu"]
-offset_left = 150.0
-offset_top = 150.0
-offset_right = 210.0
-offset_bottom = 170.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = 15.0
+offset_right = -30.0
+offset_bottom = 35.0
 text = "Efectos"
 
 [node name="SfxSlider" type="HSlider" parent="HUD/PauseMenu"]
-offset_left = 220.0
-offset_top = 150.0
-offset_right = 330.0
-offset_bottom = 170.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = 15.0
+offset_right = 90.0
+offset_bottom = 35.0
 max_value = 1.0
 step = 0.01
 value = 1.0
 
 [node name="BtnMenuPrincipalPausa" type="Button" parent="HUD/PauseMenu"]
-offset_left = 180.0
-offset_top = 190.0
-offset_right = 300.0
-offset_bottom = 220.0
-text = "Volver al Inicio"
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 55.0
+offset_right = 60.0
+offset_bottom = 85.0
+text = "Volver al Menú"
 
 [node name="StateLabel" type="Label" parent="HUD"]
 visible = false
-offset_left = 0.0
-offset_top = 90.0
-offset_right = 480.0
-offset_bottom = 130.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 72.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("pill_gold")
+theme_override_colors/font_color = Color(0.078, 0.071, 0.157, 1)
+theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
+vertical_alignment = 1
 text = ""
 
 [node name="RestartLabel" type="Label" parent="HUD"]
 visible = false
+layout_mode = 1
+anchor_right = 1.0
 offset_left = 0.0
 offset_top = 130.0
-offset_right = 480.0
+offset_right = 0.0
 offset_bottom = 150.0
 horizontal_alignment = 1
 text = "Toca para reiniciar"
 
 [node name="PhotoPopup" type="Panel" parent="HUD"]
 visible = false
-offset_left = 120.0
-offset_top = 60.0
-offset_right = 360.0
-offset_bottom = 210.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -75.0
+offset_right = 120.0
+offset_bottom = 75.0
+theme = ExtResource("5_theme")
 
 [node name="PhotoRect" type="TextureRect" parent="HUD/PhotoPopup"]
 offset_left = 8.0
@@ -245,27 +530,40 @@ autostart = false
 
 [node name="BtnReintentar" type="Button" parent="HUD"]
 visible = false
-offset_left = 116.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -124.0
 offset_top = 155.0
-offset_right = 236.0
+offset_right = -4.0
 offset_bottom = 182.0
+theme = ExtResource("5_theme")
 text = "Reintentar"
 
 [node name="BtnMenuPrincipal" type="Button" parent="HUD"]
 visible = false
-offset_left = 244.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 4.0
 offset_top = 155.0
-offset_right = 364.0
+offset_right = 124.0
 offset_bottom = 182.0
+theme = ExtResource("5_theme")
 text = "Menu Principal"
 
 [node name="BonusLabel" type="Label" parent="HUD"]
 visible = false
-offset_left = 0.0
-offset_top = 108.0
-offset_right = 480.0
-offset_bottom = 136.0
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 112.0
+offset_bottom = 112.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("pill_gold")
 horizontal_alignment = 1
+vertical_alignment = 1
 text = "¡NIVEL BONUS!"
 
 [node name="BonusCountdown" type="Timer" parent="HUD"]

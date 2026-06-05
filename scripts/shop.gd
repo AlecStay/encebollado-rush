@@ -71,3 +71,6 @@ func _update_ui() -> void:
 		row.add_child(desc_lbl)
 		row.add_child(btn)
 		_list.add_child(row)
+
+func debug_refresh() -> void:
+	_update_ui()

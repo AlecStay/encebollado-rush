@@ -38,8 +38,30 @@ func _ready() -> void:
 		_base_move_speed = move_speed * 1.3
 	else:
 		_base_move_speed = move_speed
+	_apply_skin(SettingsManager.equipped_skin)
 	_target_position = global_position
 	_set_facing(Vector2.DOWN)
+
+# Swap the 8 directional textures for the equipped cosmetic skin. "default" keeps
+# the sprites/scale authored in player.tscn. Loads atomically: a missing file in a
+# skin folder leaves the default intact instead of a half-applied swap.
+func _apply_skin(skin_id: String) -> void:
+	var info: Dictionary = SettingsManager.SKINS.get(skin_id, {})
+	var base: String = info.get("path", "")
+	if base == "":
+		return
+	var loaded := {}
+	for d: String in ["n", "ne", "e", "se", "s", "sw", "w", "nw"]:
+		var path: String = base + d + ".png"
+		if not ResourceLoader.exists(path):
+			return
+		loaded[d] = load(path)
+	tex_n = loaded["n"]; tex_ne = loaded["ne"]; tex_e = loaded["e"]; tex_se = loaded["se"]
+	tex_s = loaded["s"]; tex_sw = loaded["sw"]; tex_w = loaded["w"]; tex_nw = loaded["nw"]
+	if _body:
+		_body.scale   = Vector2.ONE   # skin sprites are pre-scaled to final on-screen size
+		_body.texture = tex_s         # face south at spawn
+	_last_facing = Vector2.DOWN
 
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
