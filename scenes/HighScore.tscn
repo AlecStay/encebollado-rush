@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dhs4r7xcvple2"]
 
-[ext_resource type="Script" uid="uid://chscore_gd_001" path="res://scripts/high_score.gd" id="1_hs"]
-[ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_bg"]
+[ext_resource type="Script" path="res://scripts/high_score.gd" id="1_hs"]
+[ext_resource type="Texture2D" path="res://sprites/menu_scores.png" id="2_bg"]
 
 [node name="HighScore" type="Control"]
 layout_mode = 3
@@ -22,29 +22,20 @@ grow_vertical = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 
-[node name="Title" type="Label" parent="."]
-layout_mode = 0
-offset_left = 140.0
-offset_top = 8.0
-offset_right = 340.0
-offset_bottom = 28.0
-text = "HIGH SCORES"
-horizontal_alignment = 1
-
 [node name="ScoreList" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 70.0
-offset_top = 38.0
-offset_right = 410.0
-offset_bottom = 240.0
-theme_override_constants/separation = 4
+offset_left = 180.0
+offset_top = 84.0
+offset_right = 362.0
+offset_bottom = 172.0
+theme_override_constants/separation = 6
 
 [node name="BtnVolver" type="Button" parent="."]
 layout_mode = 0
-offset_left = 160.0
-offset_top = 248.0
-offset_right = 320.0
-offset_bottom = 265.0
+offset_left = 180.0
+offset_top = 246.0
+offset_right = 360.0
+offset_bottom = 267.0
 text = "VOLVER AL MENÚ"
 flat = true
 alignment = 1

@@ -7,71 +7,64 @@ const _COLOR_SHADOW := Color(0.10, 0.10, 0.18)
 
 @onready var _score_list: VBoxContainer = $ScoreList
 @onready var _btn_volver: Button        = $BtnVolver
-@onready var _title: Label              = $Title
 
 func _ready() -> void:
-	_apply_theme()
+	_style_volver()
 	_populate_scores()
 	_btn_volver.pressed.connect(func() -> void:
-		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
-	)
+		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
 
-func _apply_theme() -> void:
+func _style_volver() -> void:
 	var empty := StyleBoxEmpty.new()
-	var btn_theme := Theme.new()
-	for state: String in ["normal", "hover", "pressed", "focus", "disabled"]:
-		btn_theme.set_stylebox(state, "Button", empty)
-	btn_theme.set_color("font_color", "Button", _COLOR_NORMAL)
-	btn_theme.set_color("font_hover_color", "Button", _COLOR_HOVER)
-	btn_theme.set_color("font_pressed_color", "Button", _COLOR_ACCENT)
-	btn_theme.set_color("font_focus_color", "Button", _COLOR_HOVER)
-	btn_theme.set_constant("outline_size", "Button", 2)
-	btn_theme.set_color("font_outline_color", "Button", _COLOR_SHADOW)
-	btn_theme.set_font_size("font_size", "Button", 13)
-	_btn_volver.theme = btn_theme
-
-	var lbl_theme := Theme.new()
-	lbl_theme.set_color("font_color", "Label", _COLOR_NORMAL)
-	lbl_theme.set_constant("outline_size", "Label", 2)
-	lbl_theme.set_color("font_outline_color", "Label", _COLOR_SHADOW)
-	lbl_theme.set_font_size("font_size", "Label", 14)
-	_title.theme = lbl_theme
+	var t := Theme.new()
+	for s: String in ["normal", "hover", "pressed", "focus", "disabled"]:
+		t.set_stylebox(s, "Button", empty)
+	t.set_color("font_color", "Button", _COLOR_NORMAL)
+	t.set_color("font_hover_color", "Button", _COLOR_HOVER)
+	t.set_color("font_pressed_color", "Button", _COLOR_ACCENT)
+	t.set_constant("outline_size", "Button", 3)
+	t.set_color("font_outline_color", "Button", _COLOR_SHADOW)
+	t.set_font_size("font_size", "Button", 13)
+	_btn_volver.theme = t
 
 func _populate_scores() -> void:
 	var scores := HighScoreManager.get_all_scores()
-
-	var row_theme := Theme.new()
-	row_theme.set_color("font_color", "Label", _COLOR_NORMAL)
-	row_theme.set_constant("outline_size", "Label", 2)
-	row_theme.set_color("font_outline_color", "Label", _COLOR_SHADOW)
-	row_theme.set_font_size("font_size", "Label", 12)
-
 	for i in range(GameState.LEVELS.size()):
 		var lvl_name: String = GameState.LEVELS[i].name
 		var data: Dictionary = scores.get(str(i), {"score": 0, "spondylus": 0})
-		
+
 		var row := HBoxContainer.new()
-		row.theme = row_theme
-		row.add_theme_constant_override("separation", 10)
+		row.add_theme_constant_override("separation", 6)
 
 		var name_lbl := Label.new()
-		name_lbl.text = lvl_name
-		name_lbl.custom_minimum_size = Vector2(160, 0)
-		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		name_lbl.text = "%d. %s" % [i + 1, lvl_name]
+		name_lbl.custom_minimum_size = Vector2(132, 0)
+		name_lbl.clip_text = true
+		_style_row_label(name_lbl, _COLOR_NORMAL)
 
 		var score_lbl := Label.new()
-		score_lbl.text = "%d pts" % int(data.get("score", 0))
-		score_lbl.custom_minimum_size = Vector2(60, 0)
+		score_lbl.text = _commas(int(data.get("score", 0)))
+		score_lbl.custom_minimum_size = Vector2(44, 0)
 		score_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		score_lbl.add_theme_color_override("font_color", _COLOR_HOVER)
-
-		var sp_lbl := Label.new()
-		sp_lbl.text = "%d Spondy" % int(data.get("spondylus", 0))
-		sp_lbl.custom_minimum_size = Vector2(80, 0)
-		sp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		sp_lbl.add_theme_color_override("font_color", _COLOR_ACCENT)
+		_style_row_label(score_lbl, _COLOR_HOVER)
 
 		row.add_child(name_lbl)
 		row.add_child(score_lbl)
-		row.add_child(sp_lbl)
 		_score_list.add_child(row)
+
+func _style_row_label(lbl: Label, color: Color) -> void:
+	lbl.add_theme_color_override("font_color", color)
+	lbl.add_theme_color_override("font_outline_color", _COLOR_SHADOW)
+	lbl.add_theme_constant_override("outline_size", 3)
+	lbl.add_theme_font_size_override("font_size", 12)
+
+func _commas(n: int) -> String:
+	var s := str(n)
+	var out := ""
+	var c := 0
+	for i in range(s.length() - 1, -1, -1):
+		out = s[i] + out
+		c += 1
+		if c % 3 == 0 and i > 0:
+			out = "," + out
+	return out
