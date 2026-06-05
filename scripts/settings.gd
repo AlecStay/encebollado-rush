@@ -19,11 +19,28 @@ func _ready() -> void:
 		SettingsManager.music_volume = v)
 	_sfx_slider.value_changed.connect(func(v: float) -> void:
 		SettingsManager.sfx_volume = v)
+	_style_back_button(_btn_volver)
 	_btn_volver.pressed.connect(func() -> void:
 		SettingsManager.save_settings()
 		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
 
 	call_deferred("_fade_in")
+
+# Invisible hotspot over the baked "VOLVER" art: no default gray hover box,
+# just a soft gold glow on hover so the button still gives feedback.
+func _style_back_button(btn: Button) -> void:
+	var empty := StyleBoxEmpty.new()
+	var hover := StyleBoxFlat.new()
+	hover.bg_color = Color(1.0, 0.85, 0.0, 0.22)
+	hover.set_corner_radius_all(6)
+	var pressed := StyleBoxFlat.new()
+	pressed.bg_color = Color(1.0, 0.85, 0.0, 0.34)
+	pressed.set_corner_radius_all(6)
+	btn.add_theme_stylebox_override("normal", empty)
+	btn.add_theme_stylebox_override("focus", empty)
+	btn.add_theme_stylebox_override("disabled", empty)
+	btn.add_theme_stylebox_override("hover", hover)
+	btn.add_theme_stylebox_override("pressed", pressed)
 
 func _build_slider_theme() -> Theme:
 	var t := Theme.new()

@@ -51,8 +51,8 @@ theme_override_constants/separation = 10
 
 [node name="BtnVolver" type="Button" parent="."]
 layout_mode = 0
-offset_left = 203.0
-offset_top = 242.0
-offset_right = 290.0
-offset_bottom = 265.0
+offset_left = 194.0
+offset_top = 241.0
+offset_right = 249.0
+offset_bottom = 264.0
 flat = true
