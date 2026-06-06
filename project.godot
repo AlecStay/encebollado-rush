@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 HighScoreManager="*res://scripts/high_score_manager.gd"
 GameState="*res://scripts/game_state.gd"
 SettingsManager="*res://scripts/settings_manager.gd"
+MusicManager="*res://scripts/music_manager.gd"
 DebugCommands="*res://scripts/debug_commands.gd"
 
 [display]
@@ -30,13 +31,13 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation="landscape"
 
-[gui]
-
-theme/custom_font="res://grapesoda_2/GrapeSoda.ttf"
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/funplay_mcp/plugin.cfg")
+
+[gui]
+
+theme/custom_font="res://fonts/upheaval.ttf"
 
 [input_devices]
 

@@ -19,6 +19,7 @@ const BOARDS = [
 ]
 
 func _ready() -> void:
+	MusicManager.play_menu()
 	_style_back_button(_btn_volver)
 	_btn_volver.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
 	_update_ui()

@@ -1,274 +1,139 @@
-# 🦴 HANDOFF — ENCEBOLLADO RUSH 🦴
-# CAVEMAN BRAIN DUMP. READ THIS. KNOW EVERYTHING. NO EXCUSES.
+# 🦴 HANDOFF — JOCAY RUSH (Encebollado Rush) 🦴
+# BRAIN DUMP PARA NUEVA SESIÓN. LEER ESTO. SABER TODO.
+
+> Última actualización: **5 jun 2026**. Reemplaza el estado viejo. El proyecto cambió mucho:
+> audio nuevo, fuente nueva, historia/cutscenes, tienda y apariencia funcionando, jefes
+> con ataques variados, niveles temáticos, spawns desde la orilla, etc.
 
 ---
 
-## 🧠 QUÉ DIABLOS ES ESTO
+## 🧠 QUÉ ES
+Juego **Godot 4.6**, **GDScript puro**, renderer **GL Compatibility** (NO Forward+). Top-down
+**480×270**, **horizontal bloqueado** (no rota a vertical). Buzo/surfista nada en el mar; la
+playa/orilla está arriba (~y=60), el mar abajo, todo scrollea hacia abajo.
 
-Juego **Godot 4.6** GDScript puro. Vista top-down 480×270 horizontal. Buzo nada en el mar. Playa arriba, agua abajo. TODO scrollea hacia abajo (el mundo se mueve, el buzo no avanza solo).
-
-**OBJETIVO:** Sobrevivir con 3 vidas. Acumular puntos infinitamente. NO HAY VICTORIA — solo muerte y highscores.
-
-**CONTROLES:** WASD/flechas o mouse/touch (click-drag). Móvil-friendly.
-
----
-
-## 🗺️ MAPA DEL PROYECTO — DÓNDE VIVE CADA COSA
-
-```
-Encebollado_Rush/
-├── project.godot          ← CONFIG RAÍZ. Main scene = MainMenu.tscn. 3 autoloads.
-├── CAMBIOS.md             ← Historia de sesión anterior (sprites, templates)
-├── IA_CONTEXT.md          ← Contexto técnico detallado de features avanzadas
-├── handoff.md             ← ESTE ARCHIVO. TU BIBLIA.
-│
-├── scenes/                ← LAS 5 ESCENAS DEL JUEGO
-│   ├── MainMenu.tscn      → main_menu.gd     (menú con botones animados slide-in)
-│   ├── LevelSelect.tscn   → level_select.gd   (elegir mapa + dificultad)
-│   ├── Settings.tscn       → settings.gd       (volumen, fullscreen, dificultad)
-│   ├── HighScore.tscn     → high_score.gd     (top 10 puntajes desde JSON)
-│   └── main.tscn          → main.gd           (EL GAMEPLAY. EL GORDO. EL JEFE.)
-│
-├── scripts/               ← TODA LA LÓGICA
-│   ├── main.gd             ← 381 LÍNEAS. Spawn, colisión, bonus, dificultad, mapas, audio, UI
-│   ├── player.gd           ← 157 líneas. Movimiento 8 dirs, invulnerabilidad, blink
-│   ├── spawnable.gd        ← 31 líneas. Base para toda comida/peligro. Signal "touched"
-│   ├── decoration.gd       ← 17 líneas. Parallax scroll de decoraciones
-│   ├── game_state.gd       ← AUTOLOAD. Nivel actual + array LEVELS (4 temas visuales)
-│   ├── settings_manager.gd ← AUTOLOAD. Volumen, fullscreen, dificultad. Persiste user://settings.cfg
-│   ├── high_score_manager.gd ← AUTOLOAD. Top 10 scores en user://highscores.json
-│   ├── main_menu.gd        ← Navegación menú, slide-in, hover cursor
-│   ├── level_select.gd     ← Selección de mapa (4) + dificultad (3), highlight dinámico
-│   ├── settings.gd          ← UI de settings: sliders, checkbutton, dificultad botones
-│   └── high_score.gd       ← Dibuja tabla de scores dinámicamente
-│
-├── templates/             ← PREFABS (PackedScene) — 16 escenas
-│   ├── player.tscn         ← CharacterBody2D + Sprite2D con 8 texturas direccionales
-│   ├── boat.tscn           ← Peligro. 0 pts.
-│   ├── shark.tscn          ← Peligro. 0 pts.
-│   ├── rock.tscn           ← Peligro. 0 pts.
-│   ├── trash.tscn          ← Peligro. 0 pts.
-│   ├── encebollado.tscn    ← Bonus. 10 pts.
-│   ├── ceviche.tscn        ← Bonus. 15 pts.
-│   ├── cola.tscn           ← Bonus. (comida)
-│   ├── corviche.tscn       ← Bonus. (comida)
-│   ├── fish.tscn           ← Bonus. 10 pts.
-│   ├── photo.tscn          ← Bonus manta. 25 pts. Abre popup.
-│   ├── golden.tscn         ← ESPECIAL. Trigger de nivel bonus. 8% chance.
-│   ├── decor_bubbles.tscn  ← Decoración parallax
-│   ├── decor_foam.tscn     ← Decoración parallax
-│   ├── decor_starfish.tscn ← Decoración parallax
-│   └── decor_palm.tscn     ← Decoración parallax
-│
-├── sprites/               ← 35 archivos de arte (SVG originales + PNG nuevos)
-│   ├── player_n/ne/e/se/s/sw/w/nw.png ← 8 texturas direccionales del buzo
-│   ├── player_idle.svg, player_swim.svg ← Originales
-│   ├── *_new.png           ← Arte final para cada spawnable y decoración
-│   ├── sun.svg, moon.svg   ← Ciclo día/noche
-│   ├── water_tile.svg, sand_tile.svg ← Tiles de fondo
-│   ├── mainmenu.png        ← Fondo del menú principal (7MB!)
-│   └── char_menu.png       ← Personaje del menú
-│
-├── images/                ← Assets adicionales
-├── music/                 ← Audio del juego
-└── .godot/                ← Cache de Godot (NO TOCAR)
-```
+**Loop:** elegir nivel → sobrevivir esquivando peligros, comer comida (puntos/buffos), recoger
+**spondylus** (monedas) hasta la meta → pelear al jefe → al ganarlo te **quedas en el nivel**
+sumando puntos hasta que salgas. 3 vidas. Score = "Energía Ancestral" (moneda de tienda).
 
 ---
 
-## ⚡ LOS 3 AUTOLOADS — EL ESTADO GLOBAL
-
-### 1. `GameState` (scripts/game_state.gd)
-```gdscript
-var current_level := 0   # índice del nivel seleccionado (0-3)
-const LEVELS: Array = [  # 4 temas: Amanecer, Tarde, Atardecer, Anochecer
-  { name, water_modulate, sand_modulate, ambient, sun_x, sun_y, is_night }
-]
-```
-**REGLA CAVEMAN:** `GameState.current_level` = qué mapa se usa al iniciar. Se cambia en LevelSelect.
-
-### 2. `SettingsManager` (scripts/settings_manager.gd)
-```gdscript
-var music_volume := 0.8   # 0.0 - 1.0
-var sfx_volume := 1.0     # 0.0 - 1.0
-var fullscreen := false
-var difficulty := 1       # 0=Fácil, 1=Normal, 2=Difícil
-# Persiste en: user://settings.cfg
-# Funciones: get_music_db(), get_sfx_db(), save_settings(), load_settings(), apply_fullscreen()
-```
-
-### 3. `HighScoreManager` (scripts/high_score_manager.gd)
-```gdscript
-# Persiste en: user://highscores.json
-# Top 10. Cada entrada: { score: int, won: bool, date: string }
-# save_score(score, won) — ordena desc, recorta a 10
-# get_scores() → Array
-```
+## ⚙️ CONFIG (project.godot)
+- Main scene: `MainMenu.tscn`.
+- Display: viewport 480×270, `stretch=canvas_items`/`aspect=expand`, `orientation=landscape`.
+- Fuente global: `res://fonts/upheaval.ttf` (pixel; import sin antialias). Estilo UI: **texto blanco
+  + contorno negro grueso** (en `themes/hud_theme.tres` y los themes por código).
+- **5 autoloads:** `HighScoreManager`, `GameState`, `SettingsManager`, `MusicManager`, `DebugCommands`.
+- MCP de Godot (`addons/funplay_mcp`) instalado; server HTTP en `127.0.0.1:8765`. Para usarlo desde
+  Claude Code: abrir Godot + start del dock funplay + reiniciar Claude Code (ya está en `~/.claude.json`).
 
 ---
 
-## 🎮 GAMEPLAY LOOP (main.gd) — EL CEREBRO
-
-### Spawning
-- `_hazard_scenes` = [boat, shark, rock, trash] → spawn random con timer aleatorio
-- `_bonus_scenes` = [encebollado, ceviche, cola, corviche] → spawn random con timer
-- `_golden_scene` = golden.tscn → 8% chance en cada spawn de bonus
-- `_decor_scenes` = [bubbles, foam, starfish, palm] → parallax a 60% velocidad
-- Todos los spawnables usan `spawnable.gd` base → señal `touched` al tocar player
-
-### Colisión (_on_spawnable_touched)
-- **Peligro:** Si no es invulnerable → daño (25% HP). HP=0 → pierde vida. Vidas=0 → GAME OVER
-- **Bonus:** Suma puntos. Si es "photo" → popup 2s. Checkea transición de mapa.
-- **Golden:** Entra nivel bonus (15s de comida frenética, sin peligros)
-
-### Dificultad
-- **Fácil:** Peligros spawn 1.5x más lento, bonus 0.65x más rápido, velocidad 0.8x
-- **Normal:** Sin modificadores
-- **Difícil:** Peligros spawn 0.6x más rápido, bonus 1.25x más lento, velocidad 1.3x
-- **Progresiva:** Cada 120s la velocidad sube x1.15 (infinito)
-
-### Transición de Mapas
-- Cada 500 puntos → cambia tema visual (Amanecer→Tarde→Atardecer→Noche→loop)
-- Tween suave de 1s: agua, arena, ambient light, posición sol/luna
-
-### Nivel Bonus
-- Golden pickup → para peligros, limpia pantalla, spawn frenético de comida (0.12-0.28s)
-- Dura 15s con countdown visible. Al terminar, reanuda gameplay normal.
+## 🗂️ ESCENAS (scenes/)
+| Escena | Script | Qué es |
+|--------|--------|--------|
+| MainMenu.tscn | main_menu.gd | Menú; música vía MusicManager (persistente) |
+| LevelSelect.tscn | level_select.gd | Elegir nivel (fondo `images/levels_menu.png`). Dispara la intro si `not intro_seen` |
+| Settings.tscn | settings.gd | Volumen música/SFX (slider SFX reproduce SFX random de prueba). Botón Volver |
+| HighScore.tscn | high_score.gd | Tabla de puntajes |
+| Shop.tscn | shop.gd | Tienda de "boards" (buffs gameplay) con Energía Ancestral |
+| Appearance.tscn | appearance.gd | Skins cosméticas (fondo `images/apariencias_menu.png`). Equipar/comprar |
+| Story.tscn | story.gd | **Cutscene reutilizable** (intro y final), avanza con tap/click |
+| Boss.tscn | boss.gd | Jefe bullet-hell |
+| BossProjectile.tscn | boss_projectile.gd | "Bolita" del jefe |
+| main.tscn | main.gd | **EL GAMEPLAY** |
 
 ---
 
-## 🏊 PLAYER (player.gd) — EL BUZO
-
-- **CharacterBody2D** en grupo "player"
-- **Movimiento:** WASD/flechas o mouse/touch drag. Velocidad 220.
-- **8 direcciones:** Calcula ángulo → 8 octantes → asigna textura (tex_n, tex_ne, etc.)
-- **Invulnerabilidad:** Parpadeo con modulate.a (0.35/1.0 cada 0.1s). Dura 1s post-daño.
-- **Clamp:** Se mantiene dentro del viewport con margen de 20px.
-
----
-
-## 🐟 SPAWNABLE (spawnable.gd) — LA BASE DE TODO
-
-```gdscript
-signal touched(spawnable: Area2D)
-@export var kind := ""        # "golden", "photo", etc
-@export var is_hazard := true
-@export var points := 10
-@export var scroll_speed := 120.0
-```
-- Area2D. Se mueve hacia abajo a scroll_speed.
-- Se auto-elimina al salir por abajo del viewport.
-- Emite `touched` al colisionar con body en grupo "player".
-- Cada template (.tscn) fija kind/is_hazard/points/textura en el editor.
+## ⚡ AUTOLOADS
+- **GameState** (`game_state.gd`): `current_level` (0-3) + `LEVELS` (4 temas: agua/arena/ambient/sol).
+- **SettingsManager** (`settings_manager.gd`): `music_volume`, `sfx_volume`, `unlocked_levels`,
+  `intro_seen`, `ancestral_energy`, `unlocked_boards`/`equipped_board`, `equipped_skin`/`unlocked_skins`/`SKINS`.
+  Persiste `user://settings.cfg`. Funciones: `get_music_db/get_sfx_db`, `save/load_settings`, `unlock_level`.
+- **MusicManager** (`music_manager.gd`): dueño de la música, **persiste entre escenas**. `play(stream)`
+  no reinicia si ya suena lo mismo (loop por `finished→replay`). `play_menu()` lo llaman TODAS las
+  escenas de menú → la música del menú sigue de largo. `set_volume_db`, `stop`.
+- **HighScoreManager** (`high_score_manager.gd`): top scores en `user://highscores.json`. `save_score(map, score, coins)`.
+- **DebugCommands** (`debug_commands.gd`, solo debug build).
 
 ---
 
-## 🎨 SISTEMA DE TEMAS — PALETA DE COLORES
-
-| Tema | Agua | Arena | Ambient | Sol/Luna |
-|------|------|-------|---------|----------|
-| Amanecer | (0.78, 0.88, 1.00) | (1.00, 0.80, 0.58) | (1.00, 0.85, 0.70) | Sol x=80 y=22 |
-| Tarde | (1.00, 1.00, 1.00) | (1.00, 0.96, 0.80) | (1.00, 1.00, 0.97) | Sol x=240 y=12 |
-| Atardecer | (1.00, 0.68, 0.44) | (1.00, 0.58, 0.35) | (1.00, 0.72, 0.50) | Sol x=400 y=24 |
-| Anochecer | (0.18, 0.24, 0.55) | (0.32, 0.35, 0.50) | (0.45, 0.50, 0.75) | Luna x=390 y=16 |
+## 🎵 AUDIO (carpeta music/, nombres ASCII)
+- SFX (en `main.gd`, pool de 4 players): `sfx_coin` (spondylus), `sfx_buff` (buffos/emerald/golden/comida),
+  `sfx_bomb` (corviche), `sfx_damage` (daño), `sfx_jump` (salto/dodge).
+- SFX jefe (en `boss.gd`): `sfx_boss1..4` (ataques normales, random) y `sfx_boss_spiral` (espiral/mixto).
+- Música (índice por nivel 0-3): `mus_level1..4`, `mus_boss1..4`, `mus_menu`. Loop. `mus_boss4`/`sfx_boss4`
+  cableados pero sin usar (no hay jefe 4 todavía).
 
 ---
 
-## 🧭 NAVEGACIÓN ENTRE ESCENAS
-
-```
-MainMenu
-  ├── "Un Jugador" → LevelSelect → main (gameplay)
-  ├── "Multijugador" → HighScore (reutilizado, botón mal nombrado)
-  ├── "Tienda" → print() (NO IMPLEMENTADO)
-  ├── "Configuración" → Settings
-  └── "Apariencia" → print() (NO IMPLEMENTADO)
-
-main (gameplay)
-  ├── "Reintentar" → reload_current_scene()
-  └── "Menú Principal" → MainMenu
-
-Settings → "Volver" → MainMenu (auto-save)
-HighScore → "Volver" → MainMenu
-LevelSelect → "Volver" → MainMenu
-LevelSelect → "¡JUGAR!" → main
-```
+## 🎮 GAMEPLAY (main.gd)
+- **Spawns desde la orilla:** peligros/comida/decoración nacen en `SHORE_Y=60` y bajan (no caen del cielo).
+  Player **clamp** `y>=SHORE_Y` (player.gd) → no sale del mar.
+- **Spawnables:** `_hazard_scenes` (boat/shark/rock/trash), `_bonus_scenes` (encebollado/ceviche/cola/corviche),
+  `golden` (nivel bonus), `emerald` (buff), `spondylus` (monedas). Base = `spawnable.gd` (señal `touched`).
+- **Daño:** 25% HP por golpe, i-frames 1s. Al recibir daño: **parpadeo + flash rojo sutil full-screen** (`_play_hit_flash`).
+- **Dificultad creciente por nivel:** intervalos de hazard ×0.75/nivel, `_hazard_count()` spawnea más
+  objetos en mapas altos (1/1/2/3). Además rampa temporal cada 120s.
+- **Completar nivel:** al llegar a la meta de spondylus (`_get_coins_to_pass`: 10/20/30/40) → si el mapa
+  tiene jefe `_start_boss`, si no `_complete_level()`. **`_complete_level` NO avanza de mapa**: marca
+  `_level_passed`, guarda score, desbloquea el siguiente nivel, muestra "¡NIVEL COMPLETADO!" y te quedas
+  en el MISMO nivel/música sumando puntos (dejan de salir spondylus, el jefe no reaparece). Sales por pausa→menú.
+- **Nivel bonus (golden):** 15s de comida frenética.
+- **Temas de nivel:** `_apply_level_theme` aplica `LEVELS[idx].ambient` al CanvasModulate + efecto de
+  **inundación/marea** (`_play_flood`) en la transición. Olas sutiles con shader (`_setup_waves`). Fondos
+  reales = `sprites/maps/level0-3.png`.
 
 ---
 
-## 🎨 UI THEME PATTERN — TODAS LAS PANTALLAS USAN ESTO
-
-```gdscript
-const _COLOR_NORMAL := Color(0.91, 0.91, 0.82)  # Crema
-const _COLOR_HOVER  := Color(1.00, 0.85, 0.00)  # Dorado
-const _COLOR_ACCENT := Color(1.00, 0.42, 0.21)  # Naranja
-const _COLOR_SHADOW := Color(0.10, 0.10, 0.18)  # Azul oscuro
-```
-- Todos los botones: StyleBoxEmpty + colores por código
-- Outline de 2-3px con _COLOR_SHADOW
-- Animación slide-in desde la izquierda (tween offset_left/right + modulate:a)
-- Font sizes: títulos 13-14, contenido 10-11
-
----
-
-## 📐 CONSTANTES IMPORTANTES (main.gd)
-
-| Constante | Valor | Qué hace |
-|-----------|-------|----------|
-| DAMAGE_FRACTION | 0.25 | 25% de HP por golpe (4 golpes = vida) |
-| INVULNERABLE_TIME | 1.0s | Tiempo de i-frames |
-| GOLDEN_CHANCE | 0.08 | 8% probabilidad de golden en spawn bonus |
-| BONUS_DURATION | 15.0s | Duración del nivel bonus |
-| FRENETIC_MIN/MAX | 0.12/0.28s | Spawn rate durante bonus |
-| MAP_SCORE_STEP | 500 | Puntos para cambiar tema |
-| DIFFICULTY_PERIOD | 120.0s | Cada cuánto sube la dificultad |
-| DIFFICULTY_FACTOR | 1.15 | Multiplicador de velocidad progresivo |
-| DECOR_SCROLL_FACTOR | 0.6 | Parallax de decoraciones (60% velocidad) |
+## 👑 JEFES (boss.gd)
+- `BOSS_DATA` = boss1/boss2/boss3 (name/hp/speed/period). `BOSS_MAPS = {0:boss1, 2:boss2, 3:boss3}`.
+  **El nivel 2 (map 1) NO tiene jefe** y **no existe boss4** (faltan data+sprites).
+- **HP del jefe baja SOLO con perfect-dodge:** esquivar (botón Salto) justo cuando un proyectil te alcanza
+  (`main.gd._on_boss_projectile_hit` con `is_dodging` → `take_damage(DODGE_DMG=10)`, +combo, +devuelve salto).
+  Saltar sin proyectil NO hace daño. NO hay drenaje por tiempo.
+- **Ataques variados por jefe y fase** (`ATTACKS` dict, 3 fases por vida): primitivas `_ring/_spiral/
+  _double_spiral/_aimed/_rain/_wall_gap`. boss1 aprendible, boss2 anillos/espirales de 5, boss3 denso.
+- **Escala por nivel:** `start(id, cont, player, level)` → ×hp, ×speed, ÷period.
+- Para añadir **boss4**: entrada en `BOSS_DATA` + `ATTACKS`, frames en `sprites/bosses/boss4/{idle,attack,hurt,proj}_N.png`,
+  y agregarlo a `BOSS_MAPS`. Música/SFX ya listos.
 
 ---
 
-## ⚠️ COSAS ROTAS / INCOMPLETAS / TRAMPAS
-
-1. **"Multijugador" lleva a HighScore** — El botón está mal mapeado (main_menu.gd línea 73)
-2. **"Tienda" y "Apariencia" son print()** — No implementados
-3. **No hay condición de victoria** — Solo muerte. `_end_game()` siempre pasa `won=false`
-4. **mainmenu.png pesa 7MB** — Optimizar o comprimir
-5. **El path de Godot en .vscode/settings.json tiene usuario "ASUS"** — Puede que no coincida con la máquina actual
-6. **No hay música/SFX incluidos** — Los @export de audio en main.gd probablemente están vacíos en el editor
-7. **graphify_chunk01.py** — Script Python para algo de grafos. No es parte del juego.
-8. **Jolt Physics habilitado** — Raro para un juego 2D, pero no molesta
+## 📖 HISTORIA (story.gd / Story.tscn)
+- Cutscene reutilizable: páginas `{image, lines[]}`, una línea por **tap/click**, luego siguiente imagen.
+  Datos: `INTRO` (5 escenas, `images/escena dialogo 1..5.png`) y `ENDING` (`images/escena final.png`, 7 líneas).
+- Exports: `story_id` ("intro"|"ending"), `next_scene` (cambia de escena al terminar), `pause_during` (overlay).
+- **Intro:** primera partida (`not intro_seen`). `level_select.gd` carga `Story.tscn` (preconfigurada
+  intro→main.tscn); al terminar marca `intro_seen`. El nivel no empieza hasta terminar los diálogos.
+- **Final:** al derrotar al jefe del **último nivel** (map 3), `main.gd._on_boss_defeated` instancia
+  Story.tscn como overlay en `$HUD` (`pause_during=true`); al cerrar se sigue jugando el nivel.
 
 ---
 
-## 🔧 CÓMO AGREGAR COSAS
-
-### Nuevo tipo de comida/peligro:
-1. Crear sprite en `sprites/`
-2. Duplicar template existente en `templates/`, cambiar textura + kind + is_hazard + points
-3. Agregar `preload("res://templates/nuevo.tscn")` a `_hazard_scenes` o `_bonus_scenes` en main.gd
-
-### Nueva escena/pantalla:
-1. Crear .tscn en `scenes/`
-2. Crear .gd en `scripts/`
-3. Usar el patrón de UI theme (colores, StyleBoxEmpty, slide-in tween)
-4. Navegar con `get_tree().change_scene_to_file("res://scenes/NuevaEscena.tscn")`
-
-### Nuevo autoload:
-1. Crear script en `scripts/`
-2. Agregar en project.godot → [autoload] sección
+## 🐞 DEBUG (debug_commands.gd, solo debug build)
+- **Ctrl+C** +1.000.000 Energía Ancestral · **Alt+Q** desbloquea todos los niveles · **Alt+W** completa
+  nivel/va al jefe · **Alt+E** ver intro (ignora intro_seen) · **Alt+R** ver escena final (en gameplay).
 
 ---
 
-## 🔑 REGLAS DE ORO PARA LA IA
-
-1. **NUNCA toques .godot/** — Es cache autogenerado
-2. **Los .tscn son delicados** — Edítalos con conocimiento de formato Godot o preferiblemente desde el editor
-3. **Respeta los 3 autoloads** — Son singletons, accesibles globalmente: GameState, SettingsManager, HighScoreManager
-4. **spawnable.gd es la base** — NO crees scripts separados para cada comida/peligro
-5. **El viewport es 480×270** — TODO debe caber ahí. stretch_mode = canvas_items
-6. **GDScript, no C#** — Este proyecto es 100% GDScript
-7. **Godot 4.6 + Forward Plus** — No uses APIs de Godot 3.x ni Compatibility renderer
+## ⚠️ PENDIENTES / TRAMPAS
+1. **Sin jefe en nivel 2 (map 1)** y **sin boss4** → faltan data/sprites (ver sección JEFES).
+2. `MAP_SCORE_STEP` (const en main.gd) quedó **sin uso** (antes cambiaba mapa por puntaje).
+3. Warnings menores: variable `h` sin uso en `_spawn_scene`/`_spawn_decoration` (inofensivo).
+4. `SHORE_Y=60` está duplicado como const en `main.gd` y `player.gd` (ajustable si algún mapa no calza).
+5. MCP funplay no se usa en una sesión sin reiniciar Claude Code + Godot abierto.
+6. Tras editar scripts, **cerrar y reabrir Godot** (no solo Play) para recargar autoloads/escenas.
 
 ---
 
-*Último update: 2 junio 2026 — Sesión de inicialización de memoria*
+## 🔑 REGLAS DE ORO
+1. NO tocar `.godot/` (cache).
+2. `.tscn`/`.tres` son texto pero delicados; respetar formato Godot 4.
+3. Respetar autoloads (singletons globales).
+4. `spawnable.gd` es la base de comida/peligros; NO scripts separados por item.
+5. Viewport 480×270, horizontal. GDScript, Godot 4.6, GL Compatibility.
+6. Memoria del proyecto en `~/.claude/projects/.../memory/` (índice `MEMORY.md`).
+
+*Sesión previa: menú apariencia + sistema de historia (intro/final). Antes: audio nuevo, fuente upheaval,
+música global, fix daño jefe, no-avance de nivel, spawns orilla, olas, temas de nivel.*

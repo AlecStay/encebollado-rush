@@ -6,13 +6,11 @@ extends Node2D
 @export var bonus_spawn_min := 0.8
 @export var bonus_spawn_max := 1.5
 @export var photo_texture: Texture2D
-@export var music_stream: AudioStream
-@export var hit_sfx: AudioStream
-@export var bonus_sfx: AudioStream
 
 const DAMAGE_FRACTION   := 0.25
 const INVULNERABLE_TIME := 1.0
 const SPAWN_MARGIN      := 16.0
+const SHORE_Y           := 60.0     # línea de orilla/horizonte: objetos nacen aquí y bajan
 const GOLDEN_CHANCE     := 0.20
 const BONUS_DURATION    := 15.0
 const FRENETIC_MIN      := 0.12
@@ -25,8 +23,7 @@ const MAP_FADE_TIME     := 1.0
 
 const BOSS_SCENE := preload("res://scenes/Boss.tscn")
 const BOSS_MAPS  := {0: "boss1", 2: "boss2", 3: "boss3"}   # jefe al terminar estos mapas
-const BOSS_SOUND := {0: 0, 2: 1, 3: 2}                     # índice en _rare_streams (1/2/3.wav)
-const DODGE_DMG  := 7.0
+const DODGE_DMG  := 10.0
 
 var _lives        := 3
 var _health       := 1.0
@@ -70,10 +67,18 @@ var _golden_scene: PackedScene = preload("res://templates/golden.tscn")
 var _emerald_scene: PackedScene = preload("res://templates/emerald.tscn")
 var _spondylus_scene: PackedScene = preload("res://templates/spondylus.tscn")
 
-var _ost_stream: AudioStream
-var _lost_stream: AudioStream
-var _rare_streams: Array[AudioStream] = []
-var _rare_player: AudioStreamPlayer
+# SFX
+var _sfx_buff: AudioStream
+var _sfx_bomb: AudioStream
+var _sfx_damage: AudioStream
+var _sfx_coin: AudioStream
+var _sfx_jump: AudioStream
+var _sfx_pool: Array[AudioStreamPlayer] = []
+var _sfx_idx := 0
+
+# Música (índice por nivel 0-3)
+var _level_themes: Array[AudioStream] = []
+var _boss_themes: Array[AudioStream] = []
 
 var _decor_scenes: Array[PackedScene] = [
 	preload("res://templates/decor_bubbles.tscn"),
@@ -141,6 +146,7 @@ func _ready() -> void:
 	_setup_photo_popup()
 	_load_audio()
 	_start_music()
+	_setup_waves()
 	_bonus_label.add_theme_font_size_override("font_size", 15)
 	_bonus_label.add_theme_color_override("font_color", Color(0.078, 0.071, 0.157))
 	_bonus_label.add_theme_constant_override("outline_size", 0)
@@ -172,7 +178,7 @@ func _ready() -> void:
 		m_slider.value = SettingsManager.music_volume
 		m_slider.value_changed.connect(func(v):
 			SettingsManager.music_volume = v
-			_music_player.volume_db = SettingsManager.get_music_db()
+			MusicManager.set_volume_db(SettingsManager.get_music_db())
 		)
 	var s_slider = get_node_or_null("HUD/PauseMenu/SfxSlider")
 	if s_slider:
@@ -195,7 +201,7 @@ func _apply_level_theme(idx: int, instant: bool) -> void:
 	if instant:
 		if map_tex:
 			_map.texture = map_tex
-		_canvas_modulate.color = Color.WHITE
+		_canvas_modulate.color = lvl.ambient
 		_sun.position          = Vector2(lvl.sun_x, lvl.sun_y)
 		return
 	if map_tex:
@@ -206,9 +212,50 @@ func _apply_level_theme(idx: int, instant: bool) -> void:
 		ft.tween_callback(func():
 			_map.texture = map_tex
 			_map_fade.modulate.a = 0.0)
+	_play_flood()
 	var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(_canvas_modulate, "color", Color.WHITE, MAP_FADE_TIME)
+	tween.tween_property(_canvas_modulate, "color", lvl.ambient, MAP_FADE_TIME)
 	tween.tween_property(_sun,   "position", Vector2(lvl.sun_x, lvl.sun_y), MAP_FADE_TIME)
+
+# Efecto de marea: una capa de agua turquesa sube cubriendo la pantalla durante el
+# crossfade y luego baja, revelando el nuevo mapa. Se auto-libera al terminar.
+func _play_flood() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 50
+	add_child(layer)
+	var water := ColorRect.new()
+	water.color = Color(0.20, 0.70, 0.75, 0.5)
+	water.anchor_left   = 0.0
+	water.anchor_right  = 1.0
+	water.anchor_top    = 1.0   # arranca como una línea en el fondo
+	water.anchor_bottom = 1.0
+	water.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(water)
+	var tw := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_property(water, "anchor_top", 0.0, MAP_FADE_TIME * 0.5)   # sube la marea
+	tw.tween_interval(0.1)
+	tw.tween_property(water, "anchor_top", 1.0, MAP_FADE_TIME * 0.5)   # baja la marea
+	tw.tween_callback(layer.queue_free)
+
+# Olas sutiles: brillo senoidal animado por TIME sobre el mar (de SHORE_Y hacia abajo).
+func _setup_waves() -> void:
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\n" \
+		+ "void fragment() {\n" \
+		+ "    float w = sin(UV.y * 16.0 + TIME * 2.2) * 0.5 + 0.5;\n" \
+		+ "    float w2 = sin(UV.x * 9.0 - TIME * 1.3) * 0.5 + 0.5;\n" \
+		+ "    float a = w * w2 * 0.06;\n" \
+		+ "    COLOR = vec4(1.0, 1.0, 1.0, a);\n" \
+		+ "}\n"
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	var wave := ColorRect.new()
+	wave.material       = mat
+	wave.anchor_right   = 1.0
+	wave.anchor_bottom  = 1.0
+	wave.offset_top     = SHORE_Y
+	wave.mouse_filter   = Control.MOUSE_FILTER_IGNORE
+	$BackgroundLayer.add_child(wave)
 
 func _process(delta: float) -> void:
 	if _bonus_active and not _bonus_countdown.is_stopped():
@@ -244,10 +291,17 @@ func _process(delta: float) -> void:
 
 # ── Spawning ─────────────────────────────────────────────────────────────────
 
+func _hazard_count() -> int:
+	# más objetos de daño a mayor nivel (map 0-1:1, map 2:2, map 3:3)
+	if _current_map >= 3: return 3
+	elif _current_map >= 2: return 2
+	return 1
+
 func _on_hazard_timer_timeout() -> void:
 	if _state != "playing" or _bonus_active:
 		return
-	_spawn_from(_hazard_scenes)
+	for i in _hazard_count():
+		_spawn_from(_hazard_scenes)
 	_schedule_hazard()
 
 func _on_bonus_timer_timeout() -> void:
@@ -258,7 +312,7 @@ func _on_bonus_timer_timeout() -> void:
 		_spawn_scene(_golden_scene)
 	elif r < GOLDEN_CHANCE + 0.05:
 		_spawn_scene(_emerald_scene)
-	elif r < GOLDEN_CHANCE + 0.05 + 0.35:
+	elif r < GOLDEN_CHANCE + 0.05 + 0.35 and not _level_passed:
 		_spawn_scene(_spondylus_scene)
 	else:
 		_spawn_from(_bonus_scenes)
@@ -293,7 +347,7 @@ func _spawn_decoration() -> void:
 	if sprite and sprite.texture:
 		w = sprite.texture.get_width()  * sprite.scale.x
 		h = sprite.texture.get_height() * sprite.scale.y
-	inst.position = Vector2(_rand_x(w), -h)
+	inst.position = Vector2(_rand_x(w), SHORE_Y)
 	_decorations_root.add_child(inst)
 
 func _spawn_from(scenes: Array[PackedScene]) -> void:
@@ -312,7 +366,7 @@ func _spawn_scene(scene: PackedScene) -> void:
 	if sprite and sprite.texture:
 		w = sprite.texture.get_width()
 		h = sprite.texture.get_height()
-	spawnable.position = Vector2(_rand_x(w), -h)
+	spawnable.position = Vector2(_rand_x(w), SHORE_Y)
 	_spawnables_root.add_child(spawnable)
 	spawnable.touched.connect(_on_spawnable_touched)
 
@@ -328,17 +382,17 @@ func _on_spawnable_touched(spawnable: Area2D) -> void:
 		return
 
 	if spawnable.kind == "golden":
-		_play_sfx(bonus_sfx)
+		_play_sfx(_sfx_buff)
 		_enter_bonus_level()
 		return
 
 	if spawnable.kind == "emerald":
-		_play_sfx(bonus_sfx)
+		_play_sfx(_sfx_buff)
 		_player.start_emerald_buff(15.0 * _bonus_duration_mult)
 		return
 
 	if spawnable.kind == "spondylus":
-		_play_sfx(bonus_sfx)
+		_play_sfx(_sfx_coin)
 		var extra = 0
 		if _combo_mult > 0.0 and _rng.randf() < _combo_mult:
 			extra = 1
@@ -357,11 +411,11 @@ func _on_spawnable_touched(spawnable: Area2D) -> void:
 			return
 		_reset_combo()
 		_apply_damage()
-		_play_sfx(hit_sfx)
+		_play_sfx(_sfx_damage)
 	else:
 		var prev_score := _score
 		_score += spawnable.points * _score_multiplier * _score_mult_base
-		_play_sfx(bonus_sfx)
+		_play_sfx(_sfx_buff)
 
 		if not _bonus_active:
 			match spawnable.kind:
@@ -376,6 +430,7 @@ func _on_spawnable_touched(spawnable: Area2D) -> void:
 						if node.has_method("get_node"):
 							node.scroll_speed = scroll_speed * 0.5
 				"corviche":
+					_play_sfx(_sfx_bomb)
 					_play_bomb_effect(_player.position)
 					for node in get_tree().get_nodes_in_group("spawnable"):
 						if node.get("is_hazard"): node.queue_free()
@@ -405,31 +460,32 @@ func _get_coins_to_pass() -> int:
 	else: return 40
 
 func _check_level_passed() -> void:
+	if _level_passed:
+		return
 	if _coins < _get_coins_to_pass():
 		return
 	if BOSS_MAPS.has(_current_map):
 		_start_boss(_current_map)
 	else:
-		_advance_level()
+		_complete_level()
 
-func _advance_level() -> void:
-	HighScoreManager.save_score(_current_map, _score, _coins)
-	_coins = 0
+# Nivel pasado: se QUEDA en el mismo nivel sumando puntos. No avanza de mapa,
+# no reaparece el jefe y dejan de salir spondylus. El jugador sale cuando quiera.
+func _complete_level() -> void:
+	if _level_passed:
+		return
 	_level_passed = true
-	_state_label.text = "¡NIVEL COMPLETADO!\nYa puedes volver al inicio"
+	HighScoreManager.save_score(_current_map, _score, _coins)
+	SettingsManager.unlock_level(min(_current_map + 1, GameState.LEVELS.size() - 1))
+	_state_label.text = "¡NIVEL COMPLETADO!\nPuedes seguir o volver al inicio"
 	_state_label.visible = true
 	get_tree().create_timer(4.0).timeout.connect(func(): if _state != "lose": _state_label.visible = false)
-	_current_map = (_current_map + 1) % GameState.LEVELS.size()
-	SettingsManager.unlock_level(_current_map)
-	_apply_level_theme(_current_map, false)
-	scroll_speed *= 1.25
-	hazard_spawn_min *= 0.8
-	hazard_spawn_max *= 0.8
 
 
 func _apply_damage() -> void:
 	_health = max(0.0, _health - _damage_fraction)
 	_player.start_invulnerable(INVULNERABLE_TIME)
+	_play_hit_flash()
 	if _health > 0.0:
 		return
 	_lives -= 1
@@ -442,6 +498,8 @@ func _apply_damage() -> void:
 
 func _start_boss(map: int) -> void:
 	_state = "boss"
+	if map < _boss_themes.size():
+		_play_music(_boss_themes[map])
 	_hazard_timer.stop()
 	_bonus_timer.stop()
 	_decor_timer.stop()
@@ -454,7 +512,7 @@ func _start_boss(map: int) -> void:
 	_boss.health_changed.connect(_on_boss_health_changed)
 	_boss.projectile_spawned.connect(_connect_boss_projectile)
 	_boss.defeated.connect(_on_boss_defeated.bind(map))
-	_boss.start(BOSS_MAPS[map], _boss_projectiles, _player)
+	_boss.start(BOSS_MAPS[map], _boss_projectiles, _player, map)
 	_boss_name.text = _boss.display_name()
 	_boss_name.visible = true
 	_boss_bar.visible = true
@@ -470,6 +528,7 @@ func _on_boss_projectile_hit(proj) -> void:
 	if _state != "boss":
 		return
 	if _player.is_dodging:
+		# la vida del jefe baja SOLO al esquivar un ataque real
 		if _boss and is_instance_valid(_boss):
 			_boss.take_damage(DODGE_DMG)
 		_player.refund_dodge()
@@ -480,28 +539,39 @@ func _on_boss_projectile_hit(proj) -> void:
 		return
 	_reset_combo()
 	_apply_damage()
-	_play_sfx(hit_sfx)
+	_play_sfx(_sfx_damage)
 	proj.queue_free()
 
 func _on_boss_health_changed(ratio: float) -> void:
 	_boss_bar.value = ratio
 
-func _on_boss_defeated(map: int) -> void:
-	_play_boss_sound(BOSS_SOUND.get(map, 0))
+func _on_boss_defeated(_map: int) -> void:
 	for p in _boss_projectiles.get_children():
 		p.queue_free()
 	_boss = null
 	_boss_bar.visible = false
 	_boss_name.visible = false
-	var is_last := (map == GameState.LEVELS.size() - 1)
-	_advance_level()
-	if is_last:
-		_state_label.text = "¡JUEGO COMPLETADO!"
-		_state_label.visible = true
+	_complete_level()
+	if _current_map < _level_themes.size():
+		_play_music(_level_themes[_current_map])   # vuelve al tema del nivel
 	_state = "playing"
 	_schedule_hazard()
 	_schedule_bonus()
 	_schedule_decor()
+	# Tras el jefe del último nivel: escena final (luego se sigue jugando)
+	if _map == GameState.LEVELS.size() - 1:
+		_play_ending_story()
+
+func _play_ending_story() -> void:
+	var story := preload("res://scenes/Story.tscn").instantiate()
+	story.story_id     = "ending"
+	story.pause_during = true
+	story.next_scene   = ""
+	$HUD.add_child(story)
+
+# Llamado por DebugCommands (Alt+R)
+func debug_play_ending() -> void:
+	_play_ending_story()
 
 # ── Bonus level ──────────────────────────────────────────────────────────────
 
@@ -569,9 +639,7 @@ func _update_ui() -> void:
 
 func _lose_game() -> void:
 	_state = "lose"
-	_music_player.stop()
-	if _lost_stream:
-		_play_sfx(_lost_stream)
+	MusicManager.stop()
 	_end_game("GAME OVER")
 
 func _end_game(message: String) -> void:
@@ -621,38 +689,52 @@ func _on_photo_timer_timeout() -> void:
 
 # ── Audio ────────────────────────────────────────────────────────────────────
 
+func _load_audio_file(path: String) -> AudioStream:
+	return load(path) if ResourceLoader.exists(path) else null
+
 func _load_audio() -> void:
-	if ResourceLoader.exists("res://music/ost.wav"):  _ost_stream  = load("res://music/ost.wav")
-	if ResourceLoader.exists("res://music/lost.wav"): _lost_stream = load("res://music/lost.wav")
-	for p in ["res://music/1.wav", "res://music/2.wav", "res://music/3.wav"]:
-		if ResourceLoader.exists(p): _rare_streams.append(load(p))
-	# dedicated player so the jingle isn't cut off by hit/bonus SFX on _sfx_player
-	_rare_player = AudioStreamPlayer.new()
-	$Audio.add_child(_rare_player)
+	_sfx_buff   = _load_audio_file("res://music/sfx_buff.wav")
+	_sfx_bomb   = _load_audio_file("res://music/sfx_bomb.wav")
+	_sfx_damage = _load_audio_file("res://music/sfx_damage.wav")
+	_sfx_coin   = _load_audio_file("res://music/sfx_coin.wav")
+	_sfx_jump   = _load_audio_file("res://music/sfx_jump.wav")
+
+	_level_themes = [
+		_load_audio_file("res://music/mus_level1.mp3"),
+		_load_audio_file("res://music/mus_level2.mp3"),
+		_load_audio_file("res://music/mus_level3.wav"),
+		_load_audio_file("res://music/mus_level4.wav"),
+	]
+	_boss_themes = [
+		_load_audio_file("res://music/mus_boss1.mp3"),
+		_load_audio_file("res://music/mus_boss2.mp3"),
+		_load_audio_file("res://music/mus_boss3.mp3"),
+		_load_audio_file("res://music/mus_boss4.wav"),
+	]
+
+	# pool de SFX para que efectos simultáneos (salto/monedas/daño) no se corten
+	_sfx_pool = [_sfx_player]
+	for i in range(3):
+		var p := AudioStreamPlayer.new()
+		$Audio.add_child(p)
+		_sfx_pool.append(p)
 
 func _start_music() -> void:
-	var stream = music_stream if music_stream else _ost_stream
-	if not stream:
-		return
-	_music_player.stream    = stream
-	_music_player.volume_db = SettingsManager.get_music_db()
-	if not _music_player.finished.is_connected(_start_music):
-		_music_player.finished.connect(_start_music)
-	_music_player.play()
+	if _current_map < _level_themes.size():
+		_play_music(_level_themes[_current_map])
+
+# Música por el autoload MusicManager (loop + sin reinicio si ya suena)
+func _play_music(stream: AudioStream) -> void:
+	MusicManager.play(stream)
 
 func _play_sfx(stream: AudioStream) -> void:
-	if not stream:
+	if not stream or _sfx_pool.is_empty():
 		return
-	_sfx_player.stream    = stream
-	_sfx_player.volume_db = SettingsManager.get_sfx_db()
-	_sfx_player.play()
-
-func _play_boss_sound(index: int) -> void:
-	if index < 0 or index >= _rare_streams.size() or not _rare_player:
-		return
-	_rare_player.stream    = _rare_streams[index]
-	_rare_player.volume_db = SettingsManager.get_sfx_db()
-	_rare_player.play()
+	var p: AudioStreamPlayer = _sfx_pool[_sfx_idx]
+	_sfx_idx = (_sfx_idx + 1) % _sfx_pool.size()
+	p.stream    = stream
+	p.volume_db = SettingsManager.get_sfx_db()
+	p.play()
 
 # ── VFX ────────────────────────────────────────────────────────────────────────
 
@@ -676,6 +758,18 @@ func _play_bomb_effect(center: Vector2) -> void:
 	tw.tween_property(flash, "color:a", 0.0, 0.3)
 	tw.tween_callback(flash.queue_free)
 
+# Destello rojo sutil a pantalla completa al recibir daño.
+func _play_hit_flash() -> void:
+	var flash := ColorRect.new()
+	flash.color = Color(0.9, 0.1, 0.1, 0.18)
+	flash.anchor_right  = 1.0
+	flash.anchor_bottom = 1.0
+	flash.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.35)
+	tw.tween_callback(flash.queue_free)
+
 # ── Navigation ───────────────────────────────────────────────────────────────
 
 func _on_reintentar_pressed() -> void:
@@ -688,7 +782,8 @@ func _on_menu_principal_pressed() -> void:
 
 func _on_btn_dodge_pressed() -> void:
 	if (_state == "playing" or _state == "boss") and _player:
-		_player.do_dodge()
+		if _player.do_dodge():
+			_play_sfx(_sfx_jump)
 
 func _on_btn_pausa_pressed() -> void:
 	_toggle_pause()

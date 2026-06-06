@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dlvlselect001"]
 
 [ext_resource type="Script" uid="uid://blhsocgcegic5" path="res://scripts/level_select.gd" id="1_ls"]
-[ext_resource type="Texture2D" uid="uid://df8h3akaxb535" path="res://sprites/mainmenu.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://weirtwjc7n6m" path="res://images/levels_menu.png" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://duiv4l4lfljiv" path="res://sprites/char_menu.png" id="3_player"]
 
 [node name="LevelSelect" type="Control" unique_id=1776216853]
@@ -77,10 +77,10 @@ text = "¡JUGAR!"
 
 [node name="BtnVolver" type="Button" parent="." unique_id=2110316326]
 layout_mode = 0
-offset_left = 39.0
-offset_top = 245.0
-offset_right = 224.0
-offset_bottom = 276.0
+offset_left = 376.0
+offset_top = 13.0
+offset_right = 561.0
+offset_bottom = 44.0
 text = "← VOLVER"
 flat = true
 alignment = 0

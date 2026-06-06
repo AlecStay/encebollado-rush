@@ -11,6 +11,7 @@ const _COLOR_SHADOW := Color(0.10, 0.10, 0.18)
 @onready var _energy: Label        = $Energy
 
 func _ready() -> void:
+	MusicManager.play_menu()
 	_title.add_theme_color_override("font_color", _COLOR_NORMAL)
 	_title.add_theme_color_override("font_outline_color", _COLOR_SHADOW)
 	_title.add_theme_constant_override("outline_size", 3)

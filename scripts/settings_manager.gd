@@ -5,6 +5,7 @@ const CONFIG_PATH := "user://settings.cfg"
 var music_volume := 0.8
 var sfx_volume   := 1.0
 var unlocked_levels := 1
+var intro_seen := false
 
 var ancestral_energy := 0
 var unlocked_boards: Array = ["standard"]
@@ -36,6 +37,7 @@ func save_settings() -> void:
 	cfg.set_value("audio",    "music_volume", music_volume)
 	cfg.set_value("audio",    "sfx_volume",   sfx_volume)
 	cfg.set_value("gameplay", "unlocked_levels", unlocked_levels)
+	cfg.set_value("story",    "intro_seen", intro_seen)
 	cfg.set_value("economy",  "ancestral_energy", ancestral_energy)
 	cfg.set_value("economy",  "unlocked_boards", unlocked_boards)
 	cfg.set_value("economy",  "equipped_board", equipped_board)
@@ -50,6 +52,7 @@ func load_settings() -> void:
 	music_volume = cfg.get_value("audio",    "music_volume", 0.8)
 	sfx_volume   = cfg.get_value("audio",    "sfx_volume",   1.0)
 	unlocked_levels = cfg.get_value("gameplay", "unlocked_levels", 1)
+	intro_seen      = cfg.get_value("story",    "intro_seen", false)
 	ancestral_energy = cfg.get_value("economy", "ancestral_energy", 0)
 	unlocked_boards = cfg.get_value("economy", "unlocked_boards", ["standard"])
 	equipped_board = cfg.get_value("economy", "equipped_board", "standard")

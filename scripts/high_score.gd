@@ -9,6 +9,7 @@ const _COLOR_SHADOW := Color(0.10, 0.10, 0.18)
 @onready var _btn_volver: Button        = $BtnVolver
 
 func _ready() -> void:
+	MusicManager.play_menu()
 	_style_volver()
 	_populate_scores()
 	_btn_volver.pressed.connect(func() -> void:

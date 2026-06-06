@@ -3,6 +3,8 @@ extends Node
 ##   Ctrl+C : +1,000,000 Energía Ancestral (wallet)
 ##   Alt+Q  : unlock all levels
 ##   Alt+W  : complete the current level instantly (gameplay only)
+##   Alt+E  : play the intro cutscene (ignores intro_seen / unlocks)
+##   Alt+R  : play the ending cutscene (gameplay only)
 ## Flip ENABLED to false to turn them off without removing the autoload.
 
 const ENABLED := true
@@ -64,6 +66,16 @@ func _input(event: InputEvent) -> void:
 			_notify("Nivel completado")
 		else:
 			_notify("Alt+W: solo en gameplay")
+	elif k.keycode == KEY_E and k.alt_pressed:
+		_notify("Intro (debug)")
+		get_tree().change_scene_to_file("res://scenes/Story.tscn")
+	elif k.keycode == KEY_R and k.alt_pressed:
+		var scene := get_tree().current_scene
+		if scene and scene.has_method("debug_play_ending"):
+			scene.debug_play_ending()
+			_notify("Escena final (debug)")
+		else:
+			_notify("Alt+R: solo en gameplay")
 
 func _refresh() -> void:
 	var scene := get_tree().current_scene

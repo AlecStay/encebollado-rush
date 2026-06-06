@@ -24,6 +24,7 @@ var _bonus_speed_active := false
 var _single_blink_timer := 0.0
 var _last_facing := Vector2.DOWN
 
+const SHORE_Y := 60.0   # el bote no puede subir más allá de la orilla
 const MAX_DODGES := 2
 const DODGE_COOLDOWN := 3.0
 var dodges_left := MAX_DODGES
@@ -207,7 +208,7 @@ func _get_keyboard_dir() -> Vector2:
 func _clamp_to_view() -> void:
 	var view := get_viewport_rect()
 	global_position.x = clamp(global_position.x, bounds_margin, view.size.x - bounds_margin)
-	global_position.y = clamp(global_position.y, bounds_margin, view.size.y - bounds_margin)
+	global_position.y = clamp(global_position.y, SHORE_Y, view.size.y - bounds_margin)
 
 func do_dodge() -> bool:
 	if dodges_left > 0 and not is_dodging:

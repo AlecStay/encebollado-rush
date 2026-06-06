@@ -15,6 +15,7 @@ var _selected_level := 0
 @onready var _level_list:    VBoxContainer = $LevelList
 
 func _ready() -> void:
+	MusicManager.play_menu()
 	_apply_base_theme()
 	_connect_buttons()
 	_update_unlocked_levels()
@@ -93,7 +94,11 @@ func _play_slide_in() -> void:
 func _on_jugar_pressed() -> void:
 	GameState.current_level    = _selected_level
 	SettingsManager.save_settings()
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	# Primera partida: intro antes de jugar (Story.tscn ya carga main.tscn al terminar)
+	if not SettingsManager.intro_seen:
+		get_tree().change_scene_to_file("res://scenes/Story.tscn")
+	else:
+		get_tree().change_scene_to_file("res://scenes/main.tscn")
 
 func _on_volver_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")

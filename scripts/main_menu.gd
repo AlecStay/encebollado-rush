@@ -16,6 +16,7 @@ const _COLOR_SHADOW := Color(0.10, 0.10, 0.18)
 func _ready() -> void:
 	_apply_theme()
 	_connect_buttons()
+	MusicManager.play_menu()
 	call_deferred("_play_slide_in")
 
 func _apply_theme() -> void:
@@ -23,12 +24,12 @@ func _apply_theme() -> void:
 	var theme := Theme.new()
 	for state: String in ["normal", "hover", "pressed", "focus", "disabled"]:
 		theme.set_stylebox(state, "Button", empty)
-	theme.set_color("font_color", "Button", _COLOR_NORMAL)
+	theme.set_color("font_color", "Button", Color(1, 1, 1))
 	theme.set_color("font_hover_color", "Button", _COLOR_HOVER)
 	theme.set_color("font_pressed_color", "Button", _COLOR_ACCENT)
-	theme.set_color("font_focus_color", "Button", _COLOR_HOVER)
-	theme.set_constant("outline_size", "Button", 2)
-	theme.set_color("font_outline_color", "Button", _COLOR_SHADOW)
+	theme.set_color("font_focus_color", "Button", Color(1, 1, 1))
+	theme.set_constant("outline_size", "Button", 6)
+	theme.set_color("font_outline_color", "Button", Color(0, 0, 0))
 	theme.set_font_size("font_size", "Button", 13)
 	_menu_container.theme = theme
 

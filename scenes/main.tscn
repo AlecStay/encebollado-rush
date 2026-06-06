@@ -1,19 +1,12 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene format=3 uid="uid://ceyjfi5extvc5"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://dhx41ke5xc0qf" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://templates/player.tscn" id="2_player"]
-[ext_resource type="Texture2D" path="res://sprites/water_tile.svg" id="3_water"]
-[ext_resource type="Texture2D" path="res://sprites/sand_tile.svg" id="4_sand"]
+[ext_resource type="Texture2D" uid="uid://bj3v8yckgc02k" path="res://sprites/water_tile.svg" id="3_water"]
+[ext_resource type="Texture2D" uid="uid://cmx3ehjuqniav" path="res://sprites/sand_tile.svg" id="4_sand"]
 [ext_resource type="Theme" path="res://themes/hud_theme.tres" id="5_theme"]
-[ext_resource type="Texture2D" path="res://sprites/ui_heart.png" id="6_heart"]
-[ext_resource type="Texture2D" path="res://sprites/ui_shell.png" id="7_shell"]
-
-[sub_resource type="StyleBoxFlat" id="boss_fill"]
-bg_color = Color(0.85, 0.16, 0.2, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
+[ext_resource type="Texture2D" uid="uid://bui7v7vcyj6s1" path="res://sprites/ui_heart.png" id="6_heart"]
+[ext_resource type="Texture2D" uid="uid://dq8j2uqua7tpx" path="res://sprites/ui_shell.png" id="7_shell"]
 
 [sub_resource type="StyleBoxFlat" id="boss_bg"]
 bg_color = Color(0.08, 0.08, 0.13, 0.7)
@@ -22,21 +15,12 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxFlat" id="pill_gold"]
-content_margin_left = 12.0
-content_margin_top = 5.0
-content_margin_right = 12.0
-content_margin_bottom = 5.0
-bg_color = Color(0.988, 0.8, 0, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.047, 0.047, 0.118, 1)
-corner_radius_top_left = 9
-corner_radius_top_right = 9
-corner_radius_bottom_right = 9
-corner_radius_bottom_left = 9
+[sub_resource type="StyleBoxFlat" id="boss_fill"]
+bg_color = Color(0.85, 0.16, 0.2, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="btn_dark"]
 content_margin_left = 6.0
@@ -54,103 +38,103 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[node name="Main" type="Node2D"]
+[sub_resource type="StyleBoxFlat" id="pill_gold"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(0.988, 0.8, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.047, 0.047, 0.118, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[node name="Main" type="Node2D" unique_id=897189357]
 script = ExtResource("1_main")
 
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(1, 1, 1, 1)
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=292132656]
 
-[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=106565370]
 layer = -1
 
-[node name="Map" type="TextureRect" parent="BackgroundLayer"]
+[node name="Map" type="TextureRect" parent="BackgroundLayer" unique_id=1151322239]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 expand_mode = 1
-stretch_mode = 0
 
-[node name="MapFade" type="TextureRect" parent="BackgroundLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="MapFade" type="TextureRect" parent="BackgroundLayer" unique_id=556790802]
 modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Background" type="Node2D" parent="."]
+[node name="Background" type="Node2D" parent="." unique_id=767771146]
 
-[node name="Water" type="TextureRect" parent="Background"]
+[node name="Water" type="TextureRect" parent="Background" unique_id=948547448]
 visible = false
 texture_repeat = 2
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("3_water")
 stretch_mode = 1
 
-[node name="Sand" type="TextureRect" parent="Background"]
+[node name="Sand" type="TextureRect" parent="Background" unique_id=75398114]
 visible = false
 texture_repeat = 2
-layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
 offset_bottom = 40.0
+grow_horizontal = 2
 texture = ExtResource("4_sand")
 stretch_mode = 1
 
-[node name="Sun" type="Sprite2D" parent="Background"]
+[node name="Sun" type="Sprite2D" parent="Background" unique_id=2064205486]
 position = Vector2(240, 12)
 
-[node name="Decorations" type="Node2D" parent="."]
+[node name="Decorations" type="Node2D" parent="." unique_id=1736795800]
 
-[node name="Spawnables" type="Node2D" parent="."]
+[node name="Spawnables" type="Node2D" parent="." unique_id=1930192338]
 
-[node name="BossLayer" type="Node2D" parent="."]
+[node name="BossLayer" type="Node2D" parent="." unique_id=863011504]
 
-[node name="BossProjectiles" type="Node2D" parent="."]
+[node name="BossProjectiles" type="Node2D" parent="." unique_id=159642825]
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=1594276091 instance=ExtResource("2_player")]
 position = Vector2(240, 200)
 
-[node name="Spawner" type="Node2D" parent="."]
+[node name="Spawner" type="Node2D" parent="." unique_id=1694798099]
 
-[node name="HazardTimer" type="Timer" parent="Spawner"]
+[node name="HazardTimer" type="Timer" parent="Spawner" unique_id=320144526]
 one_shot = true
-autostart = false
 
-[node name="BonusTimer" type="Timer" parent="Spawner"]
+[node name="BonusTimer" type="Timer" parent="Spawner" unique_id=2021819823]
 one_shot = true
-autostart = false
 
-[node name="FreneticTimer" type="Timer" parent="Spawner"]
-one_shot = false
-autostart = false
+[node name="FreneticTimer" type="Timer" parent="Spawner" unique_id=685135424]
 wait_time = 0.2
 
-[node name="DifficultyTimer" type="Timer" parent="Spawner"]
-one_shot = false
-autostart = false
+[node name="DifficultyTimer" type="Timer" parent="Spawner" unique_id=481127288]
 wait_time = 120.0
 
-[node name="DecorTimer" type="Timer" parent="Spawner"]
-one_shot = true
-autostart = false
+[node name="DecorTimer" type="Timer" parent="Spawner" unique_id=1544182945]
 wait_time = 1.2
+one_shot = true
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1883830001]
 
-[node name="BossBar" type="ProgressBar" parent="HUD"]
+[node name="BossBar" type="ProgressBar" parent="HUD" unique_id=1593102958]
 visible = false
-layout_mode = 1
+anchors_preset = 10
 anchor_right = 1.0
 offset_left = 40.0
 offset_top = 5.0
@@ -163,33 +147,30 @@ step = 0.001
 value = 1.0
 show_percentage = false
 
-[node name="BossName" type="Label" parent="HUD"]
+[node name="BossName" type="Label" parent="HUD" unique_id=1542240872]
 visible = false
-layout_mode = 1
+anchors_preset = 10
 anchor_right = 1.0
-offset_left = 0.0
 offset_top = 13.0
-offset_right = 0.0
 offset_bottom = 27.0
 theme_override_colors/font_color = Color(1, 0.85, 0, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.18, 1)
 theme_override_constants/outline_size = 3
-horizontal_alignment = 1
 text = "JEFE"
+horizontal_alignment = 1
 
-[node name="HealthBar" type="ProgressBar" parent="HUD"]
+[node name="HealthBar" type="ProgressBar" parent="HUD" unique_id=1553079301]
+offset_left = 15.0
+offset_top = 40.0
+offset_right = 165.0
+offset_bottom = 56.0
 theme = ExtResource("5_theme")
-offset_left = 12.0
-offset_top = 10.0
-offset_right = 162.0
-offset_bottom = 26.0
-min_value = 0.0
 max_value = 1.0
-step = 0.01
 value = 1.0
 show_percentage = false
 
-[node name="Seg1" type="ColorRect" parent="HUD/HealthBar"]
+[node name="Seg1" type="ColorRect" parent="HUD/HealthBar" unique_id=2063689651]
+layout_mode = 0
 anchor_left = 0.25
 anchor_right = 0.25
 anchor_bottom = 1.0
@@ -198,7 +179,8 @@ offset_right = 1.0
 mouse_filter = 2
 color = Color(0.047, 0.047, 0.118, 1)
 
-[node name="Seg2" type="ColorRect" parent="HUD/HealthBar"]
+[node name="Seg2" type="ColorRect" parent="HUD/HealthBar" unique_id=790931477]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
@@ -207,7 +189,8 @@ offset_right = 1.0
 mouse_filter = 2
 color = Color(0.047, 0.047, 0.118, 1)
 
-[node name="Seg3" type="ColorRect" parent="HUD/HealthBar"]
+[node name="Seg3" type="ColorRect" parent="HUD/HealthBar" unique_id=416042269]
+layout_mode = 0
 anchor_left = 0.75
 anchor_right = 0.75
 anchor_bottom = 1.0
@@ -216,63 +199,67 @@ offset_right = 1.0
 mouse_filter = 2
 color = Color(0.047, 0.047, 0.118, 1)
 
-[node name="HeartIcon" type="TextureRect" parent="HUD"]
-offset_left = 12.0
-offset_top = 31.0
-offset_right = 28.0
-offset_bottom = 46.0
+[node name="HeartIcon" type="TextureRect" parent="HUD" unique_id=170870528]
+offset_left = 13.0
+offset_top = 64.0
+offset_right = 29.0
+offset_bottom = 79.0
 texture = ExtResource("6_heart")
 stretch_mode = 3
 
-[node name="LivesLabel" type="Label" parent="HUD"]
-offset_left = 33.0
-offset_top = 27.0
-offset_right = 130.0
-offset_bottom = 50.0
+[node name="LivesLabel" type="Label" parent="HUD" unique_id=1559472086]
+offset_left = 34.0
+offset_top = 58.0
+offset_right = 131.0
+offset_bottom = 86.0
 theme_override_colors/font_color = Color(0.957, 0.949, 0.86, 1)
 theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 20
-vertical_alignment = 1
 text = "3"
+vertical_alignment = 1
 
-[node name="ScoreLabel" type="Label" parent="HUD"]
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=1222414628]
 offset_left = 10.0
-offset_top = 51.0
+offset_top = 78.0
 offset_right = 250.0
-offset_bottom = 93.0
+offset_bottom = 125.0
 theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
 theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 34
-vertical_alignment = 1
 text = "0"
+vertical_alignment = 1
 
-[node name="ShellIcon" type="TextureRect" parent="HUD"]
+[node name="ShellIcon" type="TextureRect" parent="HUD" unique_id=1908358489]
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -50.0
-offset_top = 8.0
-offset_right = -32.0
-offset_bottom = 24.0
+offset_left = -44.0
+offset_top = 40.0
+offset_right = -26.0
+offset_bottom = 56.0
+grow_horizontal = 2
 texture = ExtResource("7_shell")
 stretch_mode = 3
 
-[node name="CoinsLabel" type="Label" parent="HUD"]
+[node name="CoinsLabel" type="Label" parent="HUD" unique_id=612795657]
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -27.0
-offset_top = 6.0
-offset_right = 90.0
-offset_bottom = 28.0
+offset_left = -21.0
+offset_top = 37.0
+offset_right = 96.0
+offset_bottom = 60.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
 theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 16
-vertical_alignment = 1
 text = "0 / 20"
+vertical_alignment = 1
 
-[node name="ComboLabel" type="Label" parent="HUD"]
+[node name="ComboLabel" type="Label" parent="HUD" unique_id=1208886893]
 visible = false
 offset_left = 12.0
 offset_top = 210.0
@@ -285,8 +272,7 @@ theme_override_font_sizes/font_size = 18
 text = "Esquive Perfecto!!
 Combo x0.1"
 
-[node name="BtnPausa" type="Button" parent="HUD"]
-layout_mode = 1
+[node name="BtnPausa" type="Button" parent="HUD" unique_id=1991270013]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -294,18 +280,18 @@ offset_left = -52.0
 offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 42.0
+grow_horizontal = 0
 theme = ExtResource("5_theme")
-theme_override_styles/normal = SubResource("btn_dark")
-theme_override_styles/hover = SubResource("btn_dark")
-theme_override_styles/pressed = SubResource("btn_dark")
 theme_override_colors/font_color = Color(0.957, 0.949, 0.86, 1)
-theme_override_colors/font_hover_color = Color(0.988, 0.8, 0, 1)
 theme_override_colors/font_pressed_color = Color(0.988, 0.8, 0, 1)
+theme_override_colors/font_hover_color = Color(0.988, 0.8, 0, 1)
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("btn_dark")
+theme_override_styles/pressed = SubResource("btn_dark")
+theme_override_styles/hover = SubResource("btn_dark")
 text = "II"
 
-[node name="BtnDodge" type="Button" parent="HUD"]
-layout_mode = 1
+[node name="BtnDodge" type="Button" parent="HUD" unique_id=250481252]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -315,12 +301,13 @@ offset_left = -100.0
 offset_top = -80.0
 offset_right = -20.0
 offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
 theme = ExtResource("5_theme")
 theme_override_font_sizes/font_size = 14
 text = "Salto"
 
-[node name="DodgeBar" type="ProgressBar" parent="HUD"]
-layout_mode = 1
+[node name="DodgeBar" type="ProgressBar" parent="HUD" unique_id=357945927]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -330,28 +317,27 @@ offset_left = -100.0
 offset_top = -92.0
 offset_right = -20.0
 offset_bottom = -84.0
-theme = ExtResource("5_theme")
+grow_horizontal = 0
+grow_vertical = 0
 mouse_filter = 2
+theme = ExtResource("5_theme")
 max_value = 1.0
-step = 0.01
 value = 1.0
 show_percentage = false
 
-[node name="PauseMenu" type="Control" parent="HUD"]
+[node name="PauseMenu" type="Control" parent="HUD" unique_id=1533320651]
 process_mode = 2
 visible = false
-layout_mode = 1
+z_index = 100
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
-z_index = 100
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("5_theme")
 
-[node name="ColorRect" type="ColorRect" parent="HUD/PauseMenu"]
+[node name="ColorRect" type="ColorRect" parent="HUD/PauseMenu" unique_id=895272597]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -360,7 +346,8 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.03, 0.03, 0.07, 0.66)
 
-[node name="Card" type="Panel" parent="HUD/PauseMenu"]
+[node name="Card" type="Panel" parent="HUD/PauseMenu" unique_id=1987123374]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -372,7 +359,8 @@ offset_bottom = 110.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TitlePausa" type="Label" parent="HUD/PauseMenu"]
+[node name="TitlePausa" type="Label" parent="HUD/PauseMenu" unique_id=1376184498]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -386,11 +374,11 @@ theme_override_colors/font_color = Color(0.988, 0.8, 0, 1)
 theme_override_colors/font_outline_color = Color(0.047, 0.047, 0.118, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 24
+text = "PAUSA"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "PAUSA"
 
-[node name="BtnReanudar" type="Button" parent="HUD/PauseMenu"]
+[node name="BtnReanudar" type="Button" parent="HUD/PauseMenu" unique_id=1809371899]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -401,10 +389,13 @@ offset_left = -60.0
 offset_top = -55.0
 offset_right = 60.0
 offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Reanudar"
 
-[node name="LabelMusic" type="Label" parent="HUD/PauseMenu"]
+[node name="LabelMusic" type="Label" parent="HUD/PauseMenu" unique_id=226808226]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -415,8 +406,9 @@ offset_right = -30.0
 offset_bottom = 5.0
 text = "Música"
 
-[node name="MusicSlider" type="HSlider" parent="HUD/PauseMenu"]
+[node name="MusicSlider" type="HSlider" parent="HUD/PauseMenu" unique_id=2056076190]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -429,8 +421,9 @@ max_value = 1.0
 step = 0.01
 value = 0.8
 
-[node name="LabelSfx" type="Label" parent="HUD/PauseMenu"]
+[node name="LabelSfx" type="Label" parent="HUD/PauseMenu" unique_id=2136083277]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -441,8 +434,9 @@ offset_right = -30.0
 offset_bottom = 35.0
 text = "Efectos"
 
-[node name="SfxSlider" type="HSlider" parent="HUD/PauseMenu"]
+[node name="SfxSlider" type="HSlider" parent="HUD/PauseMenu" unique_id=1607564958]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -455,7 +449,7 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="BtnMenuPrincipalPausa" type="Button" parent="HUD/PauseMenu"]
+[node name="BtnMenuPrincipalPausa" type="Button" parent="HUD/PauseMenu" unique_id=97944651]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -466,38 +460,38 @@ offset_left = -60.0
 offset_top = 55.0
 offset_right = 60.0
 offset_bottom = 85.0
-text = "Volver al Menú"
-
-[node name="StateLabel" type="Label" parent="HUD"]
-visible = false
-layout_mode = 1
-anchor_left = 0.5
-anchor_right = 0.5
-offset_top = 72.0
-offset_bottom = 72.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/normal = SubResource("pill_gold")
+text = "Volver al Menú"
+
+[node name="StateLabel" type="Label" parent="HUD" unique_id=1919590197]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.078, 0.071, 0.157, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("pill_gold")
 horizontal_alignment = 1
 vertical_alignment = 1
-text = ""
 
-[node name="RestartLabel" type="Label" parent="HUD"]
+[node name="RestartLabel" type="Label" parent="HUD" unique_id=1203770918]
 visible = false
-layout_mode = 1
+anchors_preset = 10
 anchor_right = 1.0
-offset_left = 0.0
 offset_top = 130.0
-offset_right = 0.0
 offset_bottom = 150.0
-horizontal_alignment = 1
 text = "Toca para reiniciar"
+horizontal_alignment = 1
 
-[node name="PhotoPopup" type="Panel" parent="HUD"]
+[node name="PhotoPopup" type="Panel" parent="HUD" unique_id=1521010746]
 visible = false
-layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -507,30 +501,33 @@ offset_left = -120.0
 offset_top = -75.0
 offset_right = 120.0
 offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("5_theme")
 
-[node name="PhotoRect" type="TextureRect" parent="HUD/PhotoPopup"]
+[node name="PhotoRect" type="TextureRect" parent="HUD/PhotoPopup" unique_id=913972534]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 232.0
 offset_bottom = 104.0
 stretch_mode = 5
 
-[node name="PhotoLabel" type="Label" parent="HUD/PhotoPopup"]
+[node name="PhotoLabel" type="Label" parent="HUD/PhotoPopup" unique_id=1267751980]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 112.0
 offset_right = 232.0
 offset_bottom = 136.0
-horizontal_alignment = 1
 text = "Foto de Manta"
+horizontal_alignment = 1
 
-[node name="HideTimer" type="Timer" parent="HUD/PhotoPopup"]
+[node name="HideTimer" type="Timer" parent="HUD/PhotoPopup" unique_id=1098181205]
 one_shot = true
-autostart = false
 
-[node name="BtnReintentar" type="Button" parent="HUD"]
+[node name="BtnReintentar" type="Button" parent="HUD" unique_id=1027470097]
 visible = false
-layout_mode = 1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -124.0
@@ -540,9 +537,9 @@ offset_bottom = 182.0
 theme = ExtResource("5_theme")
 text = "Reintentar"
 
-[node name="BtnMenuPrincipal" type="Button" parent="HUD"]
+[node name="BtnMenuPrincipal" type="Button" parent="HUD" unique_id=1109689727]
 visible = false
-layout_mode = 1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = 4.0
@@ -552,9 +549,9 @@ offset_bottom = 182.0
 theme = ExtResource("5_theme")
 text = "Menu Principal"
 
-[node name="BonusLabel" type="Label" parent="HUD"]
+[node name="BonusLabel" type="Label" parent="HUD" unique_id=1250971021]
 visible = false
-layout_mode = 1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_top = 112.0
@@ -562,17 +559,16 @@ offset_bottom = 112.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/normal = SubResource("pill_gold")
+text = "¡NIVEL BONUS!"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "¡NIVEL BONUS!"
 
-[node name="BonusCountdown" type="Timer" parent="HUD"]
-one_shot = true
-autostart = false
+[node name="BonusCountdown" type="Timer" parent="HUD" unique_id=63737207]
 wait_time = 15.0
+one_shot = true
 
-[node name="Audio" type="Node" parent="."]
+[node name="Audio" type="Node" parent="." unique_id=1892256513]
 
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="Audio"]
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="Audio" unique_id=2130818867]
 
-[node name="SfxPlayer" type="AudioStreamPlayer" parent="Audio"]
+[node name="SfxPlayer" type="AudioStreamPlayer" parent="Audio" unique_id=269944897]

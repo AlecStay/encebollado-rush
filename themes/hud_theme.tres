@@ -1,24 +1,6 @@
-[gd_resource type="Theme" load_steps=10 format=3]
+[gd_resource type="Theme" format=3 uid="uid://donk8iqaepl50"]
 
-; Jocay Rush — pixel-art HUD theme (palette sampled from images/HUD.png)
-;   cream  #E6E6CC   gold #FCCC00   gold-brown #6E4A00
-;   navy   #0C0C1E   orange #FC6C30
-
-[sub_resource type="StyleBoxFlat" id="BtnNormal"]
-content_margin_left = 10.0
-content_margin_top = 5.0
-content_margin_right = 10.0
-content_margin_bottom = 5.0
-bg_color = Color(0.902, 0.902, 0.8, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.431, 0.29, 0, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxEmpty" id="BtnFocus"]
 
 [sub_resource type="StyleBoxFlat" id="BtnHover"]
 content_margin_left = 10.0
@@ -31,6 +13,22 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.878, 0.69, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="BtnNormal"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.902, 0.902, 0.8, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431, 0.29, 0, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -52,7 +50,23 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxEmpty" id="BtnFocus"]
+[sub_resource type="StyleBoxFlat" id="SliderFill"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.988, 0.8, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SliderTrack"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.047, 0.047, 0.118, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="PanelCard"]
 content_margin_left = 12.0
@@ -91,40 +105,26 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxFlat" id="SliderTrack"]
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-bg_color = Color(0.047, 0.047, 0.118, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxFlat" id="SliderFill"]
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-bg_color = Color(0.988, 0.8, 0, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
 [resource]
-Button/colors/font_color = Color(0.118, 0.094, 0.031, 1)
-Button/colors/font_hover_color = Color(0.431, 0.29, 0, 1)
-Button/colors/font_pressed_color = Color(0.118, 0.094, 0.031, 1)
-Button/colors/font_focus_color = Color(0.118, 0.094, 0.031, 1)
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_focus_color = Color(1, 1, 1, 1)
+Button/colors/font_hover_color = Color(1, 0.85, 0, 1)
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(1, 0.42, 0.21, 1)
+Button/constants/outline_size = 6
 Button/font_sizes/font_size = 13
-Button/styles/normal = SubResource("BtnNormal")
-Button/styles/hover = SubResource("BtnHover")
-Button/styles/pressed = SubResource("BtnPressed")
 Button/styles/focus = SubResource("BtnFocus")
-Label/colors/font_color = Color(0.118, 0.094, 0.031, 1)
+Button/styles/hover = SubResource("BtnHover")
+Button/styles/normal = SubResource("BtnNormal")
+Button/styles/pressed = SubResource("BtnPressed")
+HSlider/styles/grabber_area = SubResource("SliderFill")
+HSlider/styles/grabber_area_highlight = SubResource("SliderFill")
+HSlider/styles/slider = SubResource("SliderTrack")
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/constants/outline_size = 6
 Label/font_sizes/font_size = 13
 Panel/styles/panel = SubResource("PanelCard")
 ProgressBar/colors/font_color = Color(0.902, 0.902, 0.8, 1)
 ProgressBar/styles/background = SubResource("ProgBg")
 ProgressBar/styles/fill = SubResource("ProgFill")
-HSlider/styles/slider = SubResource("SliderTrack")
-HSlider/styles/grabber_area = SubResource("SliderFill")
-HSlider/styles/grabber_area_highlight = SubResource("SliderFill")
